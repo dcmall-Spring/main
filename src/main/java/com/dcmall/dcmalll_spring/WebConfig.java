@@ -1,4 +1,4 @@
-package com.dcmall.back;
+package com.dcmall.dcmalll_spring;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
