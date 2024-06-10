@@ -1,4 +1,4 @@
-package com.dcmall.back;
+package com.dcmall.back.Controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

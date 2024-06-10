@@ -23,11 +23,16 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'mysql:mysql-connector-java:8.0.33'  // 최신 MySQL 드라이버 버전
+	implementation 'org.mybatis:mybatis:3.5.16'        // 최신 MyBatis 버전
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1' // MyBatis Spring Boot Starter
 }
 
 tasks.named('test') {
