@@ -1,13 +1,13 @@
-package com.dcmall.dcmalll_spring;
+package com.dcmall.back;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class dcmalllSpringApplication {
+public class BackApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(dcmalllSpringApplication.class, args);
+        SpringApplication.run(BackApplication.class, args);
     }
 
 }
