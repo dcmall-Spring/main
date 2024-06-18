@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User List</title>
+</head>
+<body>
+<h1>User List</h1>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <!-- 추가적으로 표시할 필드들 -->
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Thymeleaf 반복문 -->
+    <tr th:each="user : ${List}">
+        <td th:text="${user.num}"></td>
+        <td th:text="${user.id}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
