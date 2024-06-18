@@ -1,6 +1,7 @@
 package com.dcmall.back.Controller;
 
 import com.dcmall.back.Service.WebCrawlerService;
+import com.dcmall.back.model.ProductInfoDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 */
 @RestController
 public class WebController {
+
     @Autowired
     public WebCrawlerService webCrawlerService;
 
