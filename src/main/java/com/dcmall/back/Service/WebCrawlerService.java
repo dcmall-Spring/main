@@ -10,39 +10,30 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class WebCrawlerService {
-    public Document scrapeWebPageWithSelenium(String url) {
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/driver/chromedriver.exe"); // Chromedriver 경로 설정
+    public void scrapeWebPageWithSelenium(String url) {
+        try {
+            Document doc = Jsoup.connect(url).get();
 
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // 헤드리스 모드로 실행
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
+            // subject-link 클래스를 가진 요소 선택
+            Elements titles = doc.select(".ellipsis-with-reply-cnt");
+            Elements urls = doc.select(".subject-link");
 
-        WebDriver driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.get(url);
+            for (Element element : titles) {
+                // 요소 자체를 포함한 HTML 출력
+                System.out.println("title: " + element.text());
+            }
 
-        String pageSource = driver.getPageSource();
-        driver.quit();
+            for(Element element : urls){
+                System.out.println("url: " + element.attr("href"));
+            }
 
-        return Jsoup.parse(pageSource);
-    }
-
-    public Elements getDivElementsByClass(Document document, String className) {
-        return document.select("div." + className);
-    }
-
-    public void QuasaCrawling() {
-        String url = "https://www.quasarzone.com/bbs/qb_saleinfo";
-        Document document = scrapeWebPageWithSelenium(url);
-        Elements elements =  getDivElementsByClass(document, "market-type-list");
-
-        for(Element e : elements){
-            System.out.println(e.text());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

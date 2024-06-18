@@ -3,7 +3,6 @@ package com.dcmall.back.Controller;
 import com.dcmall.back.Service.WebCrawlerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-
 import org.springframework.web.bind.annotation.RestController;
 
 /*
@@ -18,7 +17,7 @@ public class WebController {
     @GetMapping("/scrape")
     public String scrape() {
         try {
-            webCrawlerService.QuasaCrawling();
+            webCrawlerService.scrapeWebPageWithSelenium("https://quasarzone.com/bbs/qb_saleinfo");
             return "Complete";
         } catch (Exception e) {
             System.out.println("퀘이사 크롤링 컨트롤 오류");
