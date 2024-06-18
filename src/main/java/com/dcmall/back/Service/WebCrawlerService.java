@@ -4,46 +4,38 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.chrome.ChromeOptions;
 
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class WebCrawlerService {
-    public Document scrapeWebPageWithSelenium(String url) {
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/driver/chromedriver.exe"); // Chromedriver 경로 설정
+    public void scrapeWebPageWithSelenium(String url) {
+        try {
+            // URL로부터 Document 객체를 가져옴
+            Document doc = Jsoup.connect(url).get();
 
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless"); // 헤드리스 모드로 실행
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
+            // HTML 페이지의 제목(title) 가져오기
+            String title = doc.title();
+            System.out.println("Title: " + title);
 
-        WebDriver driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.get(url);
+            // 특정 요소 추출 (예: 모든 링크(anchor) 태그)
+            Elements links = doc.select(".ellipsis-with-reply-cnt ");
+            Elements titles= doc.select(".subject-link");
 
-        String pageSource = driver.getPageSource();
-        driver.quit();
+            for (Element link : links) {
+                // 링크의 URL과 텍스트 출력
+                System.out.println("Text: " + link.html());
+            }
+            for(Element title2 : titles){
+                System.out.println("Title: " + title2.attr("href"));
+            }
 
-        return Jsoup.parse(pageSource);
-    }
-
-    public Elements getDivElementsByClass(Document document, String className) {
-        return document.select("div." + className);
-    }
-
-    public void QuasaCrawling() {
-        String url = "https://www.quasarzone.com/bbs/qb_saleinfo";
-        Document document = scrapeWebPageWithSelenium(url);
-        Elements elements =  getDivElementsByClass(document, "market-type-list");
-
-        for(Element e : elements){
-            System.out.println(e.text());
+        }catch (IOException e) {
+            e.printStackTrace();
         }
     }
+        
 }

@@ -17,8 +17,9 @@ public class WebController {
 
     @GetMapping("/scrape")
     public String scrape() {
+        String url = "https://quasarzone.com/bbs/qb_saleinfo?_method=post&type=&page=1&_token=gBTgFnX0AruyCYJaE3n5ycAshl9fIfR2jpCcK4Xp&category=&popularity=&kind=subject&keyword=&sort=num%2C+reply&direction=DESC";
         try {
-            webCrawlerService.QuasaCrawling();
+            webCrawlerService.scrapeWebPageWithSelenium(url);
             return "Complete";
         } catch (Exception e) {
             System.out.println("퀘이사 크롤링 컨트롤 오류");
