@@ -1,11 +1,15 @@
 package com.dcmall.back.Controller;
 
 import com.dcmall.back.Service.WebCrawlerService;
-import com.dcmall.back.model.ProductInfoDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /*
 <a href="/bbs/qb_saleinfo/views/1609772" class="subject-link " style="display: block;">
@@ -26,5 +30,11 @@ public class WebController {
             System.out.println("퀘이사 크롤링 컨트롤 오류");
             return "Error: " + e.getMessage();
         }
+    }
+
+    @PostMapping("/api/receive-titles")
+    public ResponseEntity<String> receiveTitles(@RequestBody List<String> titles) {
+        System.out.println("Received titles: " + titles);
+        return ResponseEntity.ok("Titles received successfully");
     }
 }
