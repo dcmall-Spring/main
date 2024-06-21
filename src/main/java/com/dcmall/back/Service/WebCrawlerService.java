@@ -6,11 +6,17 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class WebCrawlerService {
@@ -55,9 +61,32 @@ public class WebCrawlerService {
                 dao.insertProduct("1", listTitle.get(i), listCost.get(i), listUrl.get(i));
             }
 
+            sendTitlesToClient(listTitle);
+
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
+        }
+    }
+    private void sendTitlesToClient(List<String> titles) {
+        String url = "http://localhost:3000/api/receive-titles";
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<List<String>> entity = new HttpEntity<>(titles, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                System.out.println("데이터 전송 성공: " + response.getBody());
+            } else {
+                System.out.println("데이터 전송 실패: " + response.getStatusCode() + ", " + response.getBody());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("sendTitlesToClient 예외 발생: " + e.getMessage());
         }
     }
 }
