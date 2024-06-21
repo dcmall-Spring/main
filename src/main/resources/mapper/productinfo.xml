@@ -9,6 +9,6 @@
         ]]>
     </insert>
     <select id="selectProduct" resultType="String" parameterType="int"><![CDATA[
-        SELECT url FROM dcmall.productinfo WHERE id = #{id} ORDER BY postid ASC limit 1
+        SELECT url FROM dcmall.productinfo WHERE id = #{id} ORDER BY postid DESC limit 1
         ]]></select>
 </mapper>
