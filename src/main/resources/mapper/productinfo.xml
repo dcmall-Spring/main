@@ -5,7 +5,7 @@
 <mapper namespace="com.dcmall.back.model.ProductInfoDAO">
     <insert id="insertProduct" parameterType="hashmap">
         <![CDATA[
-        INSERT INTO dcmall.productinfo (id, title, url) VALUES (#{id}, #{title}, #{url})
+        INSERT INTO dcmall.productinfo (id, title, cost, url) VALUES (#{id}, #{title},#{cost} ,#{url})
         ]]>
     </insert>
     <select id="selectProduct" resultType="String" parameterType="int"><![CDATA[
