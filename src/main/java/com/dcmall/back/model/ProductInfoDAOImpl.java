@@ -12,10 +12,11 @@ public class ProductInfoDAOImpl implements ProductInfoDAO {
     @Autowired
     private SqlSessionTemplate sqlSessionTemplate;
     @Override
-    public int insertProduct(String id, String title, String url){
+    public int insertProduct(String id, String title,String cost, String url){
         HashMap<String, String> hashMap = new HashMap<>(){{
             put("id", id);
             put("title", title);
+            put("cost", cost);
             put("url", url);
         }};
 

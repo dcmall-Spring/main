@@ -21,6 +21,7 @@ public class WebCrawlerService {
     public void scrapeWebPageWithSelenium(String url) {
         ArrayList<String> listTitle = new ArrayList<>();
         ArrayList<String> listUrl = new ArrayList<>();
+        ArrayList<String> listCost = new ArrayList<>();
         String product = this.dao.selectProduct(1);
 
         int postNumber = 0;
@@ -44,15 +45,14 @@ public class WebCrawlerService {
             for(int i = 0; i < titles.size(); i ++){
                 if(Integer.parseInt(urls.get(i).attr("href").substring(23)) > postNumber){
                     listTitle.add(titles.get(i).text());
-                    if(urls.get(i).childrenSize() > 0){
-                        listUrl.add(urls.get(i).attr("href").substring(23));
-                    }
+                    listUrl.add(urls.get(i).attr("href").substring(23));
+                    listCost.add(costs.get(i).text());
                 }
             }
 
             // 출력할 요소를 list에 저장 후 db에 저장.
             for (int i = 0; i < listTitle.size(); i++) {
-                dao.insertProduct("1", listTitle.get(i), listUrl.get(i));
+                dao.insertProduct("1", listTitle.get(i), listCost.get(i), listUrl.get(i));
             }
 
         } catch (IOException e) {
