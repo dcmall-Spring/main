@@ -1,8 +1,10 @@
 package com.dcmall.back.Controller;
 
 import com.dcmall.back.Service.WebCrawlerService;
+import com.dcmall.back.model.ProductInfoDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.RestController;
 
 /*
@@ -16,8 +18,9 @@ public class WebController {
 
     @GetMapping("/scrape")
     public String scrape() {
+        String url = "https://quasarzone.com/bbs/qb_saleinfo";
         try {
-            webCrawlerService.scrapeWebPageWithSelenium("https://quasarzone.com/bbs/qb_saleinfo");
+            webCrawlerService.scrapeWebPageWithSelenium(url);
             return "Complete";
         } catch (Exception e) {
             System.out.println("퀘이사 크롤링 컨트롤 오류");
