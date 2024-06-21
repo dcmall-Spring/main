@@ -18,7 +18,7 @@ public class WebController {
 
     @GetMapping("/scrape")
     public String scrape() {
-        String url = "https://quasarzone.com/bbs/qb_saleinfo?_method=post&type=&page=1&_token=gBTgFnX0AruyCYJaE3n5ycAshl9fIfR2jpCcK4Xp&category=&popularity=&kind=subject&keyword=&sort=num%2C+reply&direction=DESC";
+        String url = "https://quasarzone.com/bbs/qb_saleinfo";
         try {
             webCrawlerService.scrapeWebPageWithSelenium(url);
             return "Complete";

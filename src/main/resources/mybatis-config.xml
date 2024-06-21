@@ -6,9 +6,12 @@
 <configuration>
     <typeAliases>
         <typeAlias type="com.dcmall.back.model.UserDTO" alias="UserDTO"/>
+        <typeAlias type="com.dcmall.back.model.ProductInfoDTO" alias="ProductInfoDTO"/>
+        <typeAlias type="com.dcmall.back.model.SiteDTO" alias="SiteDTO"/>
     </typeAliases>
 
     <mappers>
         <mapper resource="mapper/user.xml"/>
+        <mapper resource="mapper/productinfo.xml"/>
     </mappers>
 </configuration>

@@ -5,7 +5,10 @@
 <mapper namespace="com.dcmall.back.model.ProductInfoDAO">
     <insert id="insertProduct" parameterType="hashmap">
         <![CDATA[
-        insert into dcmall.productinfo (id, title, url) values (#{id}, #{title}, #{url})
+        INSERT INTO dcmall.productinfo (id, title, url) VALUES (#{id}, #{title}, #{url})
         ]]>
     </insert>
+    <select id="selectProduct" resultType="String" parameterType="int"><![CDATA[
+        SELECT url FROM dcmall.productinfo WHERE id = #{id} ORDER BY postid ASC limit 1
+        ]]></select>
 </mapper>
