@@ -72,6 +72,7 @@ public class WebCrawlerService {
             System.out.println(e.getMessage());
         }
     }
+
     @Scheduled(fixedRate = 10000) //10초
     public void sendTitlesFromQueue(){
         List<String> titles = blockQue.poll();
