@@ -31,10 +31,4 @@ public class WebController {
             return "Error: " + e.getMessage();
         }
     }
-
-    @PostMapping("/api/receive-titles")
-    public ResponseEntity<String> receiveTitles(@RequestBody List<String> titles) {
-        System.out.println("Received titles: " + titles);
-        return ResponseEntity.ok("Titles received successfully");
-    }
 }
