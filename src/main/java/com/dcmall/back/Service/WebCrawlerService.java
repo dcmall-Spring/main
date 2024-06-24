@@ -6,17 +6,28 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
 public class WebCrawlerService {
 
     @Autowired
     ProductInfoDAO dao;
+    //일반 Queue와는 달리 멀티스레드 환경을 염두해 설계된 Queue
+    private BlockingQueue<List<String>> blockQue = new LinkedBlockingQueue<>();
 
     public void scrapeWebPageWithSelenium(String url) {
         ArrayList<String> listTitle = new ArrayList<>();
@@ -55,9 +66,45 @@ public class WebCrawlerService {
                 dao.insertProduct("1", listTitle.get(i), listCost.get(i), listUrl.get(i));
             }
 
+            blockQue.add(new ArrayList<>(listTitle));
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
+        }
+    }
+    @Scheduled(fixedRate = 10000) //10초
+    public void sendTitlesFromQueue(){
+        List<String> titles = blockQue.poll();
+        if(titles != null){
+            boolean success = sendTitlesToClient(titles);
+            if(!success){
+                //전송 실패 시 다시 큐에 추가
+                blockQue.add(titles);
+            }
+        }
+    }
+    private boolean sendTitlesToClient(List<String> titles) {  //여기 titles이 비어있네
+        String url = "http://localhost:3000/api/receive-titles";
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<List<String>> entity = new HttpEntity<>(titles, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {   //성공 시 next.js가 보낸 message : Success를 띄운다.
+                System.out.println("데이터 전송 성공: " + response.getBody());
+                return true;
+            } else {
+                System.out.println("데이터 전송 실패: " + response.getStatusCode() + ", " + response.getBody());
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("sendTitlesToClient 예외 발생: " + e.getMessage());
+            return false;
         }
     }
 }
