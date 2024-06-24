@@ -5,7 +5,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +41,7 @@ public class WebCrawlerService {
             Collections.reverse(urls);
             Collections.reverse(titles);
             Collections.reverse(costs);
-            // braek
+
             for(int i = 0; i < titles.size(); i ++){
                 if(Integer.parseInt(urls.get(i).attr("href").substring(23)) > postNumber){
                     listTitle.add(titles.get(i).text());
