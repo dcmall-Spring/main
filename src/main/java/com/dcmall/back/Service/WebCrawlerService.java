@@ -1,5 +1,6 @@
 package com.dcmall.back.Service;
 
+import com.dcmall.back.Controller.ApiController;
 import com.dcmall.back.model.ProductInfoDAO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -66,6 +67,8 @@ public class WebCrawlerService {
                 dao.insertProduct("1", listTitle.get(i), listCost.get(i), listUrl.get(i));
             }
 
+            ApiController apiController = new ApiController();
+            apiController.receiveData("test + test");
             blockQue.add(new ArrayList<>(listTitle));
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,7 +76,7 @@ public class WebCrawlerService {
         }
     }
 
-    @Scheduled(fixedRate = 10000) //10초
+   /* @Scheduled(fixedRate = 10000) //10초
     public void sendTitlesFromQueue(){
         List<String> titles = blockQue.poll();
         if(titles != null){
@@ -107,5 +110,5 @@ public class WebCrawlerService {
             System.out.println("sendTitlesToClient 예외 발생: " + e.getMessage());
             return false;
         }
-    }
+    }*/
 }

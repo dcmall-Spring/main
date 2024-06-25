@@ -16,7 +16,7 @@ public class ApiController {
         return "Hello from 김지훈!";
     }
 
-    @PostMapping("/api/data")
+    @PostMapping("/api/postapi")
     public String receiveData(@RequestBody String data) {
         // 데이터를 처리하는 로직
         System.out.println(data);
