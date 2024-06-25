@@ -29,7 +29,7 @@ public class WebCrawlerService {
     ProductInfoDAO dao;
     //일반 Queue와는 달리 멀티스레드 환경을 염두해 설계된 Queue
     private BlockingQueue<List<String>> blockQue = new LinkedBlockingQueue<>();
-
+    
     public void scrapeWebPageWithSelenium(String url) {
         ArrayList<String> listTitle = new ArrayList<>();
         ArrayList<String> listUrl = new ArrayList<>();
