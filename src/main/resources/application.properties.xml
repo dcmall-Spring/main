@@ -1,0 +1,9 @@
+spring.application.name=dcmall
+
+spring.datasource.url=jdbc:mysql://15.165.27.67:3306/dcmall
+spring.datasource.username=dcmall
+spring.datasource.password=dcmall45
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+mybatis.config-location=classpath:mybatis-config.xml
+mybatis.mapper-locations=classpath:mapper/*.xml
