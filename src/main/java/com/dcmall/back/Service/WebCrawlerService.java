@@ -26,6 +26,9 @@ public class WebCrawlerService {
 
     @Autowired
     ProductInfoDAO dao;
+    @Autowired
+    embeddingService embeddingService;
+
     //일반 Queue와는 달리 멀티스레드 환경을 염두해 설계된 Queue
     private BlockingQueue<List<String>> blockQue = new LinkedBlockingQueue<>();
 
@@ -62,49 +65,51 @@ public class WebCrawlerService {
             }
 
             // 출력할 요소를 list에 저장 후 db에 저장.
-            for (int i = 0; i < listTitle.size(); i++) {
+            for (int i = 0; i < listTitle.size(); i++) {    //tmp의 타입은 ArrayList
+                var tmp = embeddingService.getEmbedding((listTitle.get(i)));
+                System.out.println(tmp+" // "+tmp.getClass().getName());
                 dao.insertProduct("1", listTitle.get(i), listCost.get(i), listUrl.get(i));
             }
 
-            blockQue.add(new ArrayList<>(listTitle));
+            //blockQue.add(new ArrayList<>(listTitle));
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
     }
-    @Scheduled(fixedRate = 10000) //10초
-    public void sendTitlesFromQueue(){
-        List<String> titles = blockQue.poll();
-        if(titles != null){
-            boolean success = sendTitlesToClient(titles);
-            if(!success){
-                //전송 실패 시 다시 큐에 추가
-                blockQue.add(titles);
-            }
-        }
-    }
-    private boolean sendTitlesToClient(List<String> titles) {  //여기 titles이 비어있네
-        String url = "http://localhost:3000/api/receive-titles";
-
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            HttpEntity<List<String>> entity = new HttpEntity<>(titles, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-
-            if (response.getStatusCode().is2xxSuccessful()) {   //성공 시 next.js가 보낸 message : Success를 띄운다.
-                System.out.println("데이터 전송 성공: " + response.getBody());
-                return true;
-            } else {
-                System.out.println("데이터 전송 실패: " + response.getStatusCode() + ", " + response.getBody());
-                return false;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("sendTitlesToClient 예외 발생: " + e.getMessage());
-            return false;
-        }
-    }
+//    @Scheduled(fixedRate = 10000) //10초
+//    public void sendTitlesFromQueue(){
+//        List<String> titles = blockQue.poll();
+//        if(titles != null){
+//            boolean success = sendTitlesToClient(titles);
+//            if(!success){
+//                //전송 실패 시 다시 큐에 추가
+//                blockQue.add(titles);
+//            }
+//        }
+//    }
+//    private boolean sendTitlesToClient(List<String> titles) {  //여기 titles이 비어있네
+//        String url = "http://localhost:3000/api/receive-titles";
+//
+//        try {
+//            RestTemplate restTemplate = new RestTemplate();
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//            HttpEntity<List<String>> entity = new HttpEntity<>(titles, headers);
+//            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+//
+//            if (response.getStatusCode().is2xxSuccessful()) {   //성공 시 next.js가 보낸 message : Success를 띄운다.
+//                System.out.println("데이터 전송 성공: " + response.getBody());
+//                return true;
+//            } else {
+//                System.out.println("데이터 전송 실패: " + response.getStatusCode() + ", " + response.getBody());
+//                return false;
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println("sendTitlesToClient 예외 발생: " + e.getMessage());
+//            return false;
+//        }
+//    }
 }
