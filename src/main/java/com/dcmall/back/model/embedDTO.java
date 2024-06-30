@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @Data
 public class embedDTO {
@@ -13,6 +13,6 @@ public class embedDTO {
     private String title;
     @Getter
     @Setter
-    private List<Float> embedding;
+    private ArrayList<Double> embedding;
 
 }

@@ -1,6 +1,7 @@
 package com.dcmall.back.Service;
 
 import com.dcmall.back.model.ProductInfoDAO;
+import com.dcmall.back.model.embedDAO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -28,6 +29,8 @@ public class WebCrawlerService {
     ProductInfoDAO dao;
     @Autowired
     embeddingService embeddingService;
+    @Autowired
+    embedDAO eDao;
 
     //일반 Queue와는 달리 멀티스레드 환경을 염두해 설계된 Queue
     private BlockingQueue<List<String>> blockQue = new LinkedBlockingQueue<>();
@@ -65,9 +68,14 @@ public class WebCrawlerService {
             }
 
             // 출력할 요소를 list에 저장 후 db에 저장.
+            //eDao가 null이 아닌데 eDao.insertEmbed가 null임 뭔 상황
+            //select는 되는 엿같은 상황
             for (int i = 0; i < listTitle.size(); i++) {    //tmp의 타입은 ArrayList
-                var tmp = embeddingService.getEmbedding((listTitle.get(i)));
-                System.out.println(tmp+" // "+tmp.getClass().getName());
+                String sTitle = listTitle.get(i);
+                var result = embeddingService.getEmbedding(sTitle);
+
+                eDao.insertEmbed(listTitle.get(i), result);
+
                 dao.insertProduct("1", listTitle.get(i), listCost.get(i), listUrl.get(i));
             }
 
@@ -77,6 +85,7 @@ public class WebCrawlerService {
             System.out.println(e.getMessage());
         }
     }
+
 //    @Scheduled(fixedRate = 10000) //10초
 //    public void sendTitlesFromQueue(){
 //        List<String> titles = blockQue.poll();
