@@ -1,18 +1,13 @@
 package com.dcmall.back.Service;
 
 import com.dcmall.back.model.ProductInfoDAO;
+import com.dcmall.back.model.embedDAO;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,8 +21,10 @@ public class WebCrawlerService {
 
     @Autowired
     ProductInfoDAO dao;
-    //일반 Queue와는 달리 멀티스레드 환경을 염두해 설계된 Queue
-    private BlockingQueue<List<String>> blockQue = new LinkedBlockingQueue<>();
+    @Autowired
+    embeddingService embeddingService;
+    @Autowired
+    embedDAO eDao;
 
     public void scrapeWebPageWithSelenium(String url) {
         ArrayList<String> listTitle = new ArrayList<>();
@@ -37,10 +34,10 @@ public class WebCrawlerService {
 
         int postNumber = 0;
 
-        if(product != null){
+        if (product != null) {
             postNumber = Integer.parseInt(product);
         }
-        
+
         try {
             Document doc = Jsoup.connect(url).get();
 
@@ -53,8 +50,8 @@ public class WebCrawlerService {
             Collections.reverse(titles);
             Collections.reverse(costs);
 
-            for(int i = 0; i < titles.size(); i ++){
-                if(Integer.parseInt(urls.get(i).attr("href").substring(23)) > postNumber){
+            for (int i = 0; i < titles.size(); i++) {
+                if (Integer.parseInt(urls.get(i).attr("href").substring(23)) > postNumber) {
                     listTitle.add(titles.get(i).text());
                     listUrl.add(urls.get(i).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
@@ -62,50 +59,20 @@ public class WebCrawlerService {
             }
 
             // 출력할 요소를 list에 저장 후 db에 저장.
-            for (int i = 0; i < listTitle.size(); i++) {
+            //eDao가 null이 아닌데 eDao.insertEmbed가 null임 뭔 상황
+            //select는 되는 엿같은 상황
+            for (int i = 0; i < listTitle.size(); i++) {    //tmp의 타입은 ArrayList
+                String sTitle = listTitle.get(i);
+                var result = embeddingService.getEmbedding(sTitle);
+
+                eDao.insertEmbed(listTitle.get(i), result);
+
                 dao.insertProduct("1", listTitle.get(i), listCost.get(i), listUrl.get(i));
             }
 
-            blockQue.add(new ArrayList<>(listTitle));
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
-        }
-    }
-
-    @Scheduled(fixedRate = 10000) //10초
-    public void sendTitlesFromQueue(){
-        List<String> titles = blockQue.poll();
-        if(titles != null){
-            boolean success = sendTitlesToClient(titles);
-            if(!success){
-                //전송 실패 시 다시 큐에 추가
-                blockQue.add(titles);
-            }
-        }
-    }
-    private boolean sendTitlesToClient(List<String> titles) {  //여기 titles이 비어있네
-        String url = "http://localhost:3000/api/receive-titles";
-
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            HttpEntity<List<String>> entity = new HttpEntity<>(titles, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-
-            if (response.getStatusCode().is2xxSuccessful()) {   //성공 시 next.js가 보낸 message : Success를 띄운다.
-                System.out.println("데이터 전송 성공: " + response.getBody());
-                return true;
-            } else {
-                System.out.println("데이터 전송 실패: " + response.getStatusCode() + ", " + response.getBody());
-                return false;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("sendTitlesToClient 예외 발생: " + e.getMessage());
-            return false;
         }
     }
 }
