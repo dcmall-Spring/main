@@ -12,9 +12,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
 public class WebCrawlerService {
@@ -22,7 +19,7 @@ public class WebCrawlerService {
     @Autowired
     ProductInfoDAO dao;
     @Autowired
-    embeddingService embeddingService;
+    EmbeddingService embeddingService;
     @Autowired
     embedDAO eDao;
 

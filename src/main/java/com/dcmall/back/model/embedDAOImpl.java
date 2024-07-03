@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class embedDAOImpl implements embedDAO {
@@ -28,6 +26,17 @@ public class embedDAOImpl implements embedDAO {
         }catch (Exception e) {
             e.printStackTrace();
             System.out.println("Exception 문제: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public List<embedDTO> selectEmbed(){   //검색을 요청할 때마다 매번 불러오는 건 그런데..
+        try{
+            return sqlSessionTemplate.selectList("selectEmbed");
+        }catch(Exception e){
+            e.printStackTrace();
+            System.out.println("select 문제: "+ e.getMessage());
             throw e;
         }
     }
