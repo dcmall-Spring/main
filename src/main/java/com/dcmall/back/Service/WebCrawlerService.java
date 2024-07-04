@@ -181,12 +181,28 @@ public class WebCrawlerService {
                         if(realPrice(American)){
                             System.out.println("진짜 가격으로 임명한다: "+price);
                         }
-                        else price = "0";
+                        else {
+                            int priceIndex = titles.get(i).text().indexOf(price);   //price의 시작 부분 앞 글자 따옴
+
+                            if (priceIndex < titles.get(i).text().length() / 2) {
+                                price = "0"; // 가격 문자열이 제목 문자열의 전반부에 있는 경우 가격을 0으로 초기화
+                            }else{
+                                System.out.println("진짜 가격으로 임명한다: "+price);
+                            }
+                        }
                     }else if(normal.length == 2){
                         if(realPrice(normal)){
                             System.out.println("진짜 가격으로 임명한다: "+price);
                         }
-                        else price = "0";
+                        else {
+                            int priceIndex = titles.get(i).text().indexOf(price);    //price의 시작 부분 앞 글자 따옴
+
+                            if (priceIndex < titles.get(i).text().length() / 2) {
+                                price = "0"; // 가격 문자열이 제목 문자열의 전반부에 있는 경우 가격을 0으로 초기화
+                            }else{
+                                System.out.println("진짜 가격으로 임명한다: "+price);
+                            }
+                        }
                     }
                     else{
                         //둘 다 없으면 그냥 가격이라고 인정해
