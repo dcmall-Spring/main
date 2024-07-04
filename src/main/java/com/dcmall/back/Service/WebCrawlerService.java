@@ -20,7 +20,7 @@ public class WebCrawlerService {
     @Autowired
     ProductInfoDAO dao;
     @Autowired
-    embeddingService embeddingService;
+    EmbeddingService embeddingService;
     @Autowired
     embedDAO eDao;
 
