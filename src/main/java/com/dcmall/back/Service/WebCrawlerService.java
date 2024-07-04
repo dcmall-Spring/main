@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -169,7 +170,30 @@ public class WebCrawlerService {
                     int square = ruil.getSquare();
                     BigDecimal cost = ruil.getCost();
                     BigDecimal total = cost.multiply(new BigDecimal(Math.pow(10, square)));
-                    System.out.println("가격: " + total.intValue());
+
+                    String price = Integer.toString(total.intValue());
+                    String AmericanPrice = NumberFormat.getInstance().format(total.intValue());
+
+                    String[] normal = titles.get(i).text().split(price);
+                    String[] American = titles.get(i).text().split(AmericanPrice);
+
+                    if(American.length == 2){
+                        if(realPrice(American)){
+                            System.out.println("진짜 가격으로 임명한다: "+price);
+                        }
+                    }else if(normal.length == 2){
+                        if(realPrice(normal)){
+                            System.out.println("진짜 가격으로 임명한다: "+price);
+                        }
+                    }
+                    else{
+                        //둘 다 없으면 그냥 가격이라고 인정해
+                        if(square >= 1){
+                            System.out.println("진짜 가격으로 임명한다: "+price);
+                        }
+
+                    }
+
                 }
             }
         } catch (Exception e) {
@@ -236,5 +260,16 @@ public class WebCrawlerService {
             if(unit[i] == c) index = i;
         }
         return index;
+    }
+
+    public boolean realPrice(String[] arr){
+        if(arr[0].charAt(arr[0].length()-1) == '$' || arr[0].charAt(arr[0].length()-1) == '₩') {
+            return true;
+        }
+        else if((arr[1].contains("원") && arr[1].charAt(0) == '원') || (arr[1].contains("달러") && (arr[1].charAt(0) == '달' && arr[1].charAt(1) == '러'))){
+            return true;
+        }
+
+        return false;
     }
 }
