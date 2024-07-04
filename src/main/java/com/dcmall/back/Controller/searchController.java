@@ -36,6 +36,9 @@ recomList와 DB Count의 값이 달라질 때만, selectEmbed()를 한다면 불
 @RestController
 public class searchController {
     class node implements Comparable<node>{
+        /*JsonProperty 직렬화/역직렬화 시 필드 매핑을 위해 사용
+        받을 next.js에서 JsonProperty안의 값을 통해 접근할 수 있다.
+         */
         @JsonProperty("title")
         String title;
         @JsonProperty("percentage")
