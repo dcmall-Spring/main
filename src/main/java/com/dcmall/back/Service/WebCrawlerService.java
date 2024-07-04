@@ -181,10 +181,12 @@ public class WebCrawlerService {
                         if(realPrice(American)){
                             System.out.println("진짜 가격으로 임명한다: "+price);
                         }
+                        else price = "0";
                     }else if(normal.length == 2){
                         if(realPrice(normal)){
                             System.out.println("진짜 가격으로 임명한다: "+price);
                         }
+                        else price = "0";
                     }
                     else{
                         //둘 다 없으면 그냥 가격이라고 인정해
