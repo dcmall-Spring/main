@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -23,6 +24,24 @@ public class WebCrawlerService {
     EmbeddingService embeddingService;
     @Autowired
     embedDAO eDao;
+
+    class ruilwebCost {
+        BigDecimal cost;
+        int square;
+
+        public ruilwebCost(BigDecimal cost, int square) {
+            this.cost = cost;
+            this.square = square;
+        }
+
+        public BigDecimal getCost() {
+            return cost;
+        }
+
+        public int getSquare() {
+            return square;
+        }
+    }
 
     public void scrapeQuasarzone(String url) {
         ArrayList<String> listTitle = new ArrayList<>();
@@ -126,5 +145,96 @@ public class WebCrawlerService {
             System.out.println(e.getMessage());
         }
 
+    }
+
+    public void scrapeRuliWeb(String url) throws IOException {
+        ArrayList<String> listTitle = new ArrayList<>();
+        ArrayList<String> listUrl = new ArrayList<>();
+        ArrayList<String> listCost = new ArrayList<>();
+        String product = this.dao.selectProduct(3);
+
+        int postNumber = 0;
+
+        if (product != null) {
+            postNumber = Integer.parseInt(product);
+        }
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Elements titles = doc.select("a.subject_link.deco");
+            for (int i = titles.size() - 1; i > 4; i--) {
+                ArrayList<ruilwebCost> ruilwebResult = getCost(titles.get(i).text());
+                if (!ruilwebResult.isEmpty()) {
+                    ruilwebCost ruil = ruilwebResult.get(0);
+                    int square = ruil.getSquare();
+                    BigDecimal cost = ruil.getCost();
+                    BigDecimal total = cost.multiply(new BigDecimal(Math.pow(10, square)));
+                    System.out.println("가격: " + total.intValue());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("루리웹 오류: " + e.getMessage());
+        }
+    }
+
+    private ArrayList<ruilwebCost> getCost(String title) {
+        System.out.println("타이틀: " + title);
+        int square = 0;
+        StringBuilder sb = new StringBuilder();
+        boolean foundNumber = false;
+        boolean foundUnit = false;
+
+        for (int i = title.length() - 1; i >= 0; i--) {
+            char c = title.charAt(i);
+            if (Character.isDigit(c)) {
+                sb.insert(0, c);
+                foundNumber = true;
+            } else if (c == ',' && foundNumber) {
+                continue;  // 숫자 사이의 쉼표는 무시
+            } else if (!foundNumber) {
+                int index = checkUnit(c);
+                if (index > -1) {
+                    square += index;
+                    foundUnit = true;
+                } else if (c == '.' && foundUnit) {
+                    sb.insert(0, c);
+                }
+            } else if (foundNumber) {
+                if (!Character.isDigit(c)) {
+                    if(c == '.'){
+                        sb.insert(0, c);
+                    }else{
+                        break;
+                    }
+                }
+            }
+        }
+
+        ArrayList<ruilwebCost> result = new ArrayList<>();
+        String numberStr = sb.toString().trim();
+
+        if (!numberStr.isEmpty() && !numberStr.equals(".")) {
+            try {
+                BigDecimal value = new BigDecimal(numberStr);
+                result.add(new ruilwebCost(value, square));
+            } catch (NumberFormatException e) {
+                System.out.println("숫자 변환 중 오류 발생: " + numberStr);
+            }
+        } else {
+            System.out.println("유효한 숫자가 추출되지 않았습니다.");
+        }
+
+        return result;
+    }
+
+    public int checkUnit(char c){
+        char[] unit = {'일', '십', '백', '천', '만'};
+        int index = -1;
+
+        for(int i = 0 ; i < unit.length ; i++){
+            if(unit[i] == c) index = i;
+        }
+        return index;
     }
 }
