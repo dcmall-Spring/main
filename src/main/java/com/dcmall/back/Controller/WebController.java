@@ -2,14 +2,9 @@ package com.dcmall.back.Controller;
 
 import com.dcmall.back.Service.WebCrawlerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /*
 <a href="/bbs/qb_saleinfo/views/1609772" class="subject-link " style="display: block;">
@@ -22,9 +17,11 @@ public class WebController {
 
     @GetMapping("/scrape")
     public String scrape() {
-        String url = "https://quasarzone.com/bbs/qb_saleinfo";
+
+        //String url = "https://quasarzone.com/bbs/qb_saleinfo";
         try {
-            webCrawlerService.scrapeWebPageWithSelenium(url);
+            //webCrawlerService.scrapeQuasarzone(url);
+            webCrawlerService.scrapefmkorea("https://www.fmkorea.com/hotdeal");
             return "Complete";
         } catch (Exception e) {
             System.out.println("퀘이사 크롤링 컨트롤 오류");
