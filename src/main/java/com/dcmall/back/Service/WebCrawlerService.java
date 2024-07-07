@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -76,17 +77,7 @@ public class WebCrawlerService {
                 }
             }
 
-            // 출력할 요소를 list에 저장 후 db에 저장.
-            //eDao가 null이 아닌데 eDao.insertEmbed가 null임 뭔 상황
-            //select는 되는 엿같은 상황
-            for (int i = 0; i < listTitle.size(); i++) {    //tmp의 타입은 ArrayList
-                String sTitle = listTitle.get(i);
-                var result = embeddingService.getEmbedding(sTitle);
-
-                eDao.insertEmbed(listTitle.get(i), result);
-
-                dao.insertProduct("1", listTitle.get(i), listCost.get(i), listUrl.get(i));
-            }
+            inputDB("1", listTitle, listCost, listUrl);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -133,14 +124,6 @@ public class WebCrawlerService {
             System.out.println("titles number : " + titles.size());
             System.out.println("costs number : " + costs.size());
 
-            for (int i = 0; i < titles.size(); i++) {
-                if (Integer.parseInt(titles.get(i).attr("href").substring(1)) > postNumber) {
-                    listTitle.add(titles.get(i).text());
-                    listUrl.add(titles.get(i).attr("href").substring(1));
-                    listCost.add(costs.get(i).text());
-                }
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
@@ -162,58 +145,80 @@ public class WebCrawlerService {
 
         try {
             Document doc = Jsoup.connect(url).get();
-            Elements titles = doc.select("a.subject_link.deco");
-            for (int i = titles.size() - 1; i > 4; i--) {
-                ArrayList<ruilwebCost> ruilwebResult = getCost(titles.get(i).text());
-                if (!ruilwebResult.isEmpty()) {
-                    ruilwebCost ruil = ruilwebResult.get(0);
-                    int square = ruil.getSquare();
-                    BigDecimal cost = ruil.getCost();
-                    BigDecimal total = cost.multiply(new BigDecimal(Math.pow(10, square)));
+            Elements titles = doc.select("a.subject_link.deco[href*='1020']:not(:has(strong))");
 
-                    String price = Integer.toString(total.intValue());
-                    String AmericanPrice = NumberFormat.getInstance().format(total.intValue());
+            for (int i = titles.size() - 1; i >= 0; i--) {
+                String[] link = titles.get(i).attr("href").split("1020");
+                String[] censored = link[1].substring(0, link[1].length()-1).split("/");
 
-                    String[] normal = titles.get(i).text().split(price);
-                    String[] American = titles.get(i).text().split(AmericanPrice);
+                if(Integer.parseInt(censored[censored.length-1]) > postNumber){
+                    ArrayList<ruilwebCost> ruilwebResult = getCost(titles.get(i).text());
+                    if (!ruilwebResult.isEmpty()) {
+                        ruilwebCost ruil = ruilwebResult.get(0);
+                        int square = ruil.getSquare();
+                        BigDecimal cost = ruil.getCost();
+                        BigDecimal total = cost.multiply(BigDecimal.TEN.pow(square)); // BigDecimal의 pow 메서드 사용
 
-                    if(American.length == 2){
-                        if(realPrice(American)){
-                            System.out.println("진짜 가격으로 임명한다: "+price);
-                        }
-                        else {
-                            int priceIndex = titles.get(i).text().indexOf(price);   //price의 시작 부분 앞 글자 따옴
+                        String price = total.toString();
+                        String AmericanPrice = NumberFormat.getInstance().format(total);
 
-                            if (priceIndex < titles.get(i).text().length() / 2) {
-                                price = "0"; // 가격 문자열이 제목 문자열의 전반부에 있는 경우 가격을 0으로 초기화
+                        try{
+                            String[] normal = titles.get(i).text().split(price);
+                            String[] American = titles.get(i).text().split(AmericanPrice);
+
+                            if(American.length >= 2){
+                                if(realPrice(American) == 0){
+                                    price = "0";
+                                }else if(realPrice(American) == 1){
+                                    if(price.equals("0"))
+                                        price = "0";
+                                    else
+                                        price = ("₩ "+price+" (KRW)");
+                                }
+                                else{
+                                    if(price.equals("0"))
+                                        price = "0";
+                                    else
+                                        price = ("$ " + price + " (USD)");
+                                }
+                            }else if(normal.length >= 2){
+                                if(realPrice(normal) == 0){
+                                    price = "0";
+                                }else if(realPrice(normal) == 1){
+                                    if(price.equals("0"))
+                                        price = "0";
+                                    else
+                                        price = ("₩ "+price+" (KRW)");
+                                }else{
+                                    if(price.equals("0"))
+                                        price = "0";
+                                    else
+                                        price = ("$ " + price + " (USD)");
+                                }
+                            }else if(square > 0){
+                                price = total.setScale(0, RoundingMode.DOWN).toString();
+                                price = ("₩ "+price+" (KRW)");
                             }else{
-                                System.out.println("진짜 가격으로 임명한다: "+price);
+                                price = "0";
                             }
+                        }catch (Exception e){
+                            price = "0";
                         }
-                    }else if(normal.length == 2){
-                        if(realPrice(normal)){
-                            System.out.println("진짜 가격으로 임명한다: "+price);
-                        }
-                        else {
-                            int priceIndex = titles.get(i).text().indexOf(price);    //price의 시작 부분 앞 글자 따옴
 
-                            if (priceIndex < titles.get(i).text().length() / 2) {
-                                price = "0"; // 가격 문자열이 제목 문자열의 전반부에 있는 경우 가격을 0으로 초기화
-                            }else{
-                                System.out.println("진짜 가격으로 임명한다: "+price);
-                            }
-                        }
+
+                        listCost.add(price);
+                        listTitle.add(titles.get(i).text());
+                        postNumber = Integer.parseInt(censored[censored.length-1]);
+                        listUrl.add(censored[censored.length-1]);
+                    }else{
+                        listCost.add("0");
+                        listTitle.add(titles.get(i).text());
+                        postNumber = Integer.parseInt(censored[censored.length-1]);
+                        listUrl.add(censored[censored.length-1]);
                     }
-                    else{
-                        //둘 다 없으면 그냥 가격이라고 인정해
-                        if(square >= 1){
-                            System.out.println("진짜 가격으로 임명한다: "+price);
-                        }
-
-                    }
-
                 }
             }
+            inputDB("3", listTitle, listCost, listUrl);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("루리웹 오류: " + e.getMessage());
@@ -221,7 +226,7 @@ public class WebCrawlerService {
     }
 
     private ArrayList<ruilwebCost> getCost(String title) {
-        System.out.println("타이틀: " + title);
+        System.out.println("타이틀: "+title);
         int square = 0;
         StringBuilder sb = new StringBuilder();
         boolean foundNumber = false;
@@ -261,10 +266,12 @@ public class WebCrawlerService {
                 BigDecimal value = new BigDecimal(numberStr);
                 result.add(new ruilwebCost(value, square));
             } catch (NumberFormatException e) {
-                System.out.println("숫자 변환 중 오류 발생: " + numberStr);
+                BigDecimal value = new BigDecimal("0");
+                result.add(new ruilwebCost(value, 0));
             }
         } else {
-            System.out.println("유효한 숫자가 추출되지 않았습니다.");
+            BigDecimal value = new BigDecimal("0");
+            result.add(new ruilwebCost(value, 0));
         }
 
         return result;
@@ -280,14 +287,27 @@ public class WebCrawlerService {
         return index;
     }
 
-    public boolean realPrice(String[] arr){
-        if(arr[0].charAt(arr[0].length()-1) == '$' || arr[0].charAt(arr[0].length()-1) == '₩') {
-            return true;
-        }
-        else if((arr[1].contains("원") && arr[1].charAt(0) == '원') || (arr[1].contains("달러") && (arr[1].charAt(0) == '달' && arr[1].charAt(1) == '러'))){
-            return true;
+    public int realPrice(String[] arr){
+        if(arr[arr.length-2].charAt(arr[arr.length-2].length()-1) == '₩' || (arr[arr.length-1].charAt(0) == '원')){    //원화 1
+            return 1;
+        }else if(arr[arr.length-2].charAt(arr[arr.length-2].length()-1) == '$' ||(arr[arr.length-1].charAt(0) == '달' && arr[arr.length-1].charAt(1) == '러')){ //달러 2
+            return 2;
         }
 
-        return false;
+        return 0;
+    }
+
+    private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
+        for (int i = 0; i < listTitle.size(); i++) {
+            String sTitle = listTitle.get(i);
+            if(eDao.isExist(sTitle).equals(""))
+            {
+                var result = embeddingService.getEmbedding(sTitle);
+
+                eDao.insertEmbed(listTitle.get(i), result);
+            }
+
+            dao.insertProduct(siteNumber, listTitle.get(i), listCost.get(i), listUrl.get(i));
+        }
     }
 }

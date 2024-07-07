@@ -6,4 +6,6 @@ public interface embedDAO {
     void insertEmbed(String title, ArrayList<Double> embedding);
 
     List<embedDTO> selectEmbed();
+
+    String isExist(String title);
 }
