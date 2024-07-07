@@ -300,7 +300,7 @@ public class WebCrawlerService {
     private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
         for (int i = 0; i < listTitle.size(); i++) {
             String sTitle = listTitle.get(i);
-            if(eDao.isExist(sTitle).equals(""))
+            if(eDao.isExist(sTitle) == null)
             {
                 var result = embeddingService.getEmbedding(sTitle);
 
