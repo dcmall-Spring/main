@@ -5,6 +5,7 @@ import com.dcmall.back.model.embedDAO;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 @Service
 public class WebCrawlerService {
@@ -225,6 +227,60 @@ public class WebCrawlerService {
         }
     }
 
+    public void scrapeArcalive(String url) throws IOException {
+        ArrayList<String> listTitle = new ArrayList<>();
+        ArrayList<String> listUrl = new ArrayList<>();
+        ArrayList<String> listCost = new ArrayList<>();
+        String product = this.dao.selectProduct(4);
+
+        int postNumber = 0;
+
+        if (product != null) {
+            postNumber = Integer.parseInt(product);
+        }
+
+        try{
+            Document doc = Jsoup.connect(url).get();
+            Elements row = doc.select("div.vrow-inner:not(:has(div.vrow-top.deal.deal-close))");
+            for(int i = row.size()-1 ; i >= 0 ; i--){
+                try{
+                    String post = row.get(i).select("a.title.hybrid-title").attr("href");
+                    String[] postSplit = post.split("/");
+                    String[] realPost = postSplit[postSplit.length-1].split("\\?");
+                    if(Integer.parseInt(realPost[0]) > postNumber){
+                        try {
+                            String title =  Objects.requireNonNull(row.get(i).select("a.title.hybrid-title").first()).ownText().trim();
+                            String price = row.get(i).select("span.deal-price").text();
+
+                            StringBuilder sb = new StringBuilder(price);
+                            if(price.contains("원")){
+                                sb.setLength(sb.length() - 1);
+                                sb.insert(0,"₩ ");
+                                sb.insert(sb.length(), " (KRW)");
+                            }else if(price.contains("$")){
+                                sb.insert(0,"$ ");
+                                sb.insert(sb.length(), " (USD)");
+                            }
+
+                            listTitle.add(title);
+                            listCost.add(sb.toString());
+                            listUrl.add(realPost[0]);
+                        } catch(Exception e) {
+                            System.out.println("error : " + e);
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    System.out.println("안되네~: "+e.getMessage());
+                }
+            }
+            inputDB("4", listTitle, listCost, listUrl);
+        }catch(Exception e){
+            e.printStackTrace();
+            System.out.println("아카라이브 스크랩 오류: "+e.getMessage());
+        }
+    }
+
     private ArrayList<ruilwebCost> getCost(String title) {
         System.out.println("타이틀: "+title);
         int square = 0;
@@ -300,8 +356,7 @@ public class WebCrawlerService {
     private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
         for (int i = 0; i < listTitle.size(); i++) {
             String sTitle = listTitle.get(i);
-            if(eDao.isExist(sTitle) == null)
-            {
+            if (eDao.isExist(sTitle) == null) {
                 var result = embeddingService.getEmbedding(sTitle);
 
                 eDao.insertEmbed(listTitle.get(i), result);
