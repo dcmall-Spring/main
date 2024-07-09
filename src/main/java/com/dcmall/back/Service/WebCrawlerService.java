@@ -207,35 +207,15 @@ public class WebCrawlerService {
                             price = "0";
                         }
 
-                        String[] titleCut = titles.get(i).text().split("]");
-                        StringBuilder sb = new StringBuilder();
-                        for(int j = 1 ; j < titleCut.length ; j++)
-                        {
-                            if(j >= 2){
-                                sb.append("]");
-                            }
-                            sb.append(titleCut[j]);
-                        }
-
-
+                        String headCuttedTitle = removeHead(titles.get(i).text());
                         listCost.add(price);
-                        listTitle.add(sb.toString());
+                        listTitle.add(headCuttedTitle);
                         postNumber = Integer.parseInt(censored[censored.length-1]);
                         listUrl.add(censored[censored.length-1]);
                     }else{
-                        String[] titleCut = titles.get(i).text().split("]");
-                        StringBuilder sb = new StringBuilder();
-                        for(int j = 1 ; j < titleCut.length ; j++)
-                        {
-                            if(j >= 2){
-                                sb.append("]");
-                            }
-                            sb.append(titleCut[j]);
-                        }
-
-
+                        String headCuttedTitle = removeHead(titles.get(i).text());
                         listCost.add("0");
-                        listTitle.add(sb.toString());
+                        listTitle.add(headCuttedTitle);
                         postNumber = Integer.parseInt(censored[censored.length-1]);
                         listUrl.add(censored[censored.length-1]);
                     }
@@ -385,5 +365,30 @@ public class WebCrawlerService {
 
             dao.insertProduct(siteNumber, listTitle.get(i), listCost.get(i), listUrl.get(i));
         }
+    }
+    
+    private String removeHead(String title){
+        if(title.charAt(0) == '['){
+            String[] titleCut = title.split("]");
+            if(titleCut.length >= 2){
+                StringBuilder sb = new StringBuilder();
+                for(int j = 1 ; j < titleCut.length ; j++)
+                {
+                    if(j >= 2){
+                        sb.append("]");
+                    }
+                    sb.append(titleCut[j]);
+                }
+
+                if(sb.charAt(0) == ' '){
+                    sb.deleteCharAt(0);
+                }
+
+                return sb.toString();
+            }else return title;
+
+        }else
+            return title;
+
     }
 }
