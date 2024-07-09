@@ -207,14 +207,35 @@ public class WebCrawlerService {
                             price = "0";
                         }
 
+                        String[] titleCut = titles.get(i).text().split("]");
+                        StringBuilder sb = new StringBuilder();
+                        for(int j = 1 ; j < titleCut.length ; j++)
+                        {
+                            if(j >= 2){
+                                sb.append("]");
+                            }
+                            sb.append(titleCut[j]);
+                        }
+
 
                         listCost.add(price);
-                        listTitle.add(titles.get(i).text());
+                        listTitle.add(sb.toString());
                         postNumber = Integer.parseInt(censored[censored.length-1]);
                         listUrl.add(censored[censored.length-1]);
                     }else{
+                        String[] titleCut = titles.get(i).text().split("]");
+                        StringBuilder sb = new StringBuilder();
+                        for(int j = 1 ; j < titleCut.length ; j++)
+                        {
+                            if(j >= 2){
+                                sb.append("]");
+                            }
+                            sb.append(titleCut[j]);
+                        }
+
+
                         listCost.add("0");
-                        listTitle.add(titles.get(i).text());
+                        listTitle.add(sb.toString());
                         postNumber = Integer.parseInt(censored[censored.length-1]);
                         listUrl.add(censored[censored.length-1]);
                     }

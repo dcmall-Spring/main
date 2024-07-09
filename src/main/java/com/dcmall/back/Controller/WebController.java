@@ -22,8 +22,8 @@ public class WebController {
         try {
             //webCrawlerService.scrapeQuasarzone(url);
             //webCrawlerService.scrapefmkorea("https://www.fmkorea.com/hotdeal");
-            //webCrawlerService.scrapeRuliWeb("https://m.ruliweb.com/market/board/1020");
-            webCrawlerService.scrapeArcalive("https://arca.live/b/hotdeal");
+            webCrawlerService.scrapeRuliWeb("https://m.ruliweb.com/market/board/1020");
+            //webCrawlerService.scrapeArcalive("https://arca.live/b/hotdeal");
             return "Complete";
         } catch (Exception e) {
             System.out.println("퀘이사 크롤링 컨트롤 오류");
