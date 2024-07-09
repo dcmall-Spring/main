@@ -366,29 +366,22 @@ public class WebCrawlerService {
             dao.insertProduct(siteNumber, listTitle.get(i), listCost.get(i), listUrl.get(i));
         }
     }
-    
-    private String removeHead(String title){
-        if(title.charAt(0) == '['){
-            String[] titleCut = title.split("]");
-            if(titleCut.length >= 2){
-                StringBuilder sb = new StringBuilder();
-                for(int j = 1 ; j < titleCut.length ; j++)
-                {
-                    if(j >= 2){
-                        sb.append("]");
-                    }
-                    sb.append(titleCut[j]);
-                }
 
-                if(sb.charAt(0) == ' '){
-                    sb.deleteCharAt(0);
-                }
+    private String removeHead(String title) {
+        if (title.charAt(0) == '[') {
+            int firstCloseBracket = title.indexOf(']');
+            // 첫 번째 ']' 이후의 문자열을 가져옴
+            String remainingTitle = title.substring(firstCloseBracket + 1).trim();
 
-                return sb.toString();
-            }else return title;
+            // 남은 문자열이 비어있지 않고 '['로 시작하면 그대로 반환
+            if (!remainingTitle.isEmpty() && remainingTitle.charAt(0) == '[') {
+                return remainingTitle;
+            }
 
-        }else
+            // 그 외의 경우, 남은 문자열을 반환
+            return remainingTitle;
+        } else {
             return title;
-
+        }
     }
 }
