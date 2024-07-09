@@ -35,6 +35,9 @@ dependencies {
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.1' // MyBatis Spring Boot Starter
 	implementation 'org.jsoup:jsoup:1.17.2'
 	implementation 'org.seleniumhq.selenium:selenium-java:4.21.0'
+	// https://mvnrepository.com/artifact/org.postgresql/postgresql
+	implementation 'org.postgresql:postgresql:42.1.4'
+
 
 }
 

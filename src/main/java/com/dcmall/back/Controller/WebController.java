@@ -19,12 +19,17 @@ import java.util.List;
 public class WebController {
     @Autowired
     public WebCrawlerService webCrawlerService;
+    @Autowired
+    private com.dcmall.back.model.embedDAOImpl embedDAOImpl;
 
     @GetMapping("/scrape")
     public String scrape() {
-        String url = "https://quasarzone.com/bbs/qb_saleinfo";
         try {
-            webCrawlerService.scrapeWebPageWithSelenium(url);
+            String test = embedDAOImpl.emdbed();
+            System.out.println("test" + test);
+            System.out.println("aaa");
+            //webCrawlerService.scrapequasarzone("https://quasarzone.com/bbs/qb_saleinfo");
+            webCrawlerService.scrapefmrkorea("https://www.fmkorea.com/hotdeal");
             return "Complete";
         } catch (Exception e) {
             System.out.println("퀘이사 크롤링 컨트롤 오류");

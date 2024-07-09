@@ -2,6 +2,7 @@ package com.dcmall.back.model;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -9,8 +10,13 @@ import java.util.List;
 
 @Repository
 public class ProductInfoDAOImpl implements ProductInfoDAO {
+
+    private final SqlSessionTemplate masterSqlSession;
+
     @Autowired
-    private SqlSessionTemplate sqlSessionTemplate;
+    public ProductInfoDAOImpl(@Qualifier("masterSqlSessionTemplate") SqlSessionTemplate masterSqlSession){
+        this.masterSqlSession = masterSqlSession;
+    }
     @Override
     public int insertProduct(String id, String title,String cost, String url){
         HashMap<String, String> hashMap = new HashMap<>(){{
@@ -20,7 +26,7 @@ public class ProductInfoDAOImpl implements ProductInfoDAO {
             put("url", url);
         }};
 
-        return sqlSessionTemplate.insert("insertProduct", hashMap);
+        return masterSqlSession.insert("insertProduct", hashMap);
     }
 
     /**
@@ -29,6 +35,6 @@ public class ProductInfoDAOImpl implements ProductInfoDAO {
      */
     @Override
     public String selectProduct(int id) {
-        return sqlSessionTemplate.selectOne("selectProduct", id);
+        return masterSqlSession.selectOne("selectProduct", id);
     }
 }
