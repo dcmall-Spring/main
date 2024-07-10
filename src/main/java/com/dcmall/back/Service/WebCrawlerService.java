@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 @Service
@@ -64,20 +65,22 @@ public class WebCrawlerService {
             Elements titles = doc.select(".ellipsis-with-reply-cnt");
             Elements urls = doc.select(".subject-link");
             Elements costs = doc.select(".text-orange");
-
-            Collections.reverse(urls);
-            Collections.reverse(titles);
-            Collections.reverse(costs);
-
-            for (int i = 0; i < titles.size(); i++) {
+            for (int i = titles.size() - 1; i >= 0; i--) {
                 if (Integer.parseInt(urls.get(i).attr("href").substring(23)) > postNumber) {
-                    listTitle.add(titles.get(i).text());
+                    String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
+                    String[] title = titles.get(i).text().split("]");
+                    listTitle.add(titles.get(i).text().split("]")[1]);
                     listUrl.add(urls.get(i).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
                 }
             }
 
-            inputDB("1", listTitle, listCost, listUrl);
+
+            for(String s : listTitle){
+                System.out.println("title " + s);
+            }
+
+            //inputDB("1", listTitle, listCost, listUrl);
 
         } catch (IOException e) {
             e.printStackTrace();
