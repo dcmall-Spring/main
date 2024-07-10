@@ -91,7 +91,7 @@ public class WebCrawlerService {
          */
         try {
             Connection.Response response = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Safari/605.1.15")
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59")
                     .execute();
 
             System.out.println(response);
@@ -100,26 +100,42 @@ public class WebCrawlerService {
 
             // subject-link 클래스를 가진 요소 선택
             Elements titles = doc.select(".hotdeal_var8");
-            Elements costs = doc.select(".hotdeal_info");
+            Elements costs = doc.select(".hotdeal_info span:contains(가격)");
+            Elements delTitle = doc.select(".hotdeal_var8Y[href]");
             System.out.println("titles: " + titles.get(1).text());
             System.out.println("Url: " + titles.get(1).text());
             System.out.println("titles: " + titles.get(1).attr("href"));
-            System.out.println("titles: " + costs.get(1).select("span:contains(가격)"));
-
+            System.out.println("delete: " + delTitle.get(0));
 
             Collections.reverse(titles);
             Collections.reverse(costs);
+            System.out.println("costs: " + delTitle.get(0));
+            System.out.println("aa");
+
 
             System.out.println("titles number : " + titles.size());
             System.out.println("costs number : " + costs.size());
 
-            for (int i = 0; i < titles.size(); i++) {
-                if (Integer.parseInt(titles.get(i).attr("href").substring(1)) > postNumber) {
-                    listTitle.add(titles.get(i).text());
-                    listUrl.add(titles.get(i).attr("href").substring(1));
-                    listCost.add(costs.get(i).text());
+            if(titles.size() == costs.size()) {
+                for (int i = 0; i < titles.size(); i++) {
+                    if (Long.parseLong(titles.get(i).attr("href").substring(1)) > postNumber) {
+                        listTitle.add(titles.get(i).text());
+                        listUrl.add(titles.get(i).attr("href").substring(1));
+                        listCost.add(costs.get(i).text());
+                    }
+                }
+            } else {
+                for (int i = 0; i < titles.size(); i++) {
+                    System.out.println(costs.get(i).selectFirst("a").attr("href")+ " " + titles.get(i).attr("href"));
+                    if (Long.parseLong(titles.get(i).attr("href").substring(1)) > postNumber &&
+                            costs.get(i).attr("href").equals(titles.get(i).attr("href"))) {
+                        listTitle.add(titles.get(i).text());
+                        listUrl.add(titles.get(i).attr("href").substring(1));
+                        listCost.add(costs.get(i).text());
+                    }
                 }
             }
+        System.out.println("aaa");
 
         } catch (Exception e) {
             e.printStackTrace();
