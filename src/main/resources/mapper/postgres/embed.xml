@@ -10,4 +10,7 @@
     <select id="selectEmbed" resultType="embedDTO">
         SELECT * FROM public.embedTable;
     </select>
+    <select id="isExist" resultType="String">
+        SELECT title FROM public.embedTable WHERE title = #{title};
+    </select>
 </mapper>

@@ -40,4 +40,15 @@ public class embedDAOImpl implements embedDAO {
             throw e;
         }
     }
+
+    @Override
+    public String isExist(String title){
+        try{
+            return sqlSessionTemplate.selectOne("isExist", title);
+        }catch(Exception e){
+            e.printStackTrace();
+            System.out.println("isExist 문제: "+ e.getMessage());
+            throw e;
+        }
+    }
 }
