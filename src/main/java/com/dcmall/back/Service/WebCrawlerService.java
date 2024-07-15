@@ -71,7 +71,7 @@ public class WebCrawlerService {
                 if (Integer.parseInt(urls.get(i).attr("href").substring(23)) > postNumber) {
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String[] title = titles.get(i).text().split("]");
-                    deleteCost(title., cost);
+                    deleteCost(title[1], cost);
                     listTitle.add(titles.get(i).text().split("]")[1]);
                     listUrl.add(urls.get(i).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
@@ -346,15 +346,37 @@ public class WebCrawlerService {
         ArrayList<String> result = new ArrayList<>();
         
         int start = -1;
+
+        int costCheck = 0;
         
         for(int i = 1 ; i < title.length() ; i++){
-            if(title.charAt(i) == '['){
+            if(title.charAt(i) == '[' || title.charAt(i) == '('){
                 start = i;
-            } else if (title.charAt(i) == ']' && start != -1) {
-                System.out.println("괄호내용 : " + title.substring(start, i + 1));
+            } else if (title.charAt(i) == ']' || title.charAt(i) == ')' && start != -1) {
+                System.out.println("start count : " + start);
+                System.out.println("괄호내용 : " + title.substring(start + 1, i));
+                String costEqual = title.substring(start + 1, i).trim();
+                System.out.println("costEqual : " + costEqual);
+                for(int j = 0; j < costEqual.length(); j++){
+                    if(costEqual.charAt(j) == cost.charAt(costCheck)){
+                        costCheck ++;
+                        if(costCheck >= cost.length()){
+                            break;
+                        }
+                    } else {
+                        costCheck = 0;
+                    }
+                }
+                System.out.println("length : " + cost.length());
+                if(costCheck == cost.length()){
+                    title = title.substring(1, start);
+                    System.out.println("answer : " + title);
+                }
                 start = -1;
             }
         }
+
+        System.out.println("stop");
 
         return result;
     }
