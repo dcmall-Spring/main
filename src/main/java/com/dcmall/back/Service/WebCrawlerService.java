@@ -32,10 +32,12 @@ public class WebCrawlerService {
     class ruilwebCost {
         BigDecimal cost;
         int square;
+        int index;
 
-        public ruilwebCost(BigDecimal cost, int square) {
+        public ruilwebCost(BigDecimal cost, int square, int index) {
             this.cost = cost;
             this.square = square;
+            this.index = index;
         }
 
         public BigDecimal getCost() {
@@ -44,6 +46,10 @@ public class WebCrawlerService {
 
         public int getSquare() {
             return square;
+        }
+
+        public int getIndex(){
+            return index;
         }
     }
 
@@ -154,71 +160,97 @@ public class WebCrawlerService {
                 String[] censored = link[1].substring(0, link[1].length()-1).split("/");
 
                 if(Integer.parseInt(censored[censored.length-1]) > postNumber){
-                    ArrayList<ruilwebCost> ruilwebResult = getCost(titles.get(i).text());
-                    if (!ruilwebResult.isEmpty()) {
-                        ruilwebCost ruil = ruilwebResult.get(0);
-                        int square = ruil.getSquare();
-                        BigDecimal cost = ruil.getCost();
-                        BigDecimal total = cost.multiply(BigDecimal.TEN.pow(square)); // BigDecimal의 pow 메서드 사용
+                    boolean checkCost = false;
+                    int square = 0;
+                    BigDecimal cost = new BigDecimal(0);
+                    BigDecimal total = new BigDecimal(0);
+                    String price = "";
+                    ArrayList<ruilwebCost> ruilwebResult = new ArrayList<>();
+                    ruilwebResult.add(new ruilwebCost(total, 0, Integer.MAX_VALUE));
 
-                        String price = total.toString();
-                        String AmericanPrice = NumberFormat.getInstance().format(total);
+                    while(!checkCost){
+                        ruilwebResult = getCost(titles.get(i).text(), (ruilwebResult.get(0).getIndex() == Integer.MAX_VALUE) ? titles.get(i).text().length() : ruilwebResult.get(0).getIndex() );
+                        //System.out.println("검사: "+ruilwebResult.get(0).getCost()+" // "+ruilwebResult.get(0).getSquare());
+                        if (ruilwebResult.get(0).getCost().intValue() != -1) {
+                            ruilwebCost ruil = ruilwebResult.get(0);
+                            square = ruil.getSquare();
+                            cost = ruil.getCost();
+                            total = cost.multiply(BigDecimal.TEN.pow(square)); // BigDecimal의 pow 메서드 사용
 
-                        try{
-                            String[] normal = titles.get(i).text().split(price);
-                            String[] American = titles.get(i).text().split(AmericanPrice);
+                            price = total.toString();
+                            String AmericanPrice = NumberFormat.getInstance().format(total);
 
-                            if(American.length >= 2){
-                                if(realPrice(American) == 0){
-                                    price = "0";
-                                }else if(realPrice(American) == 1){
-                                    if(price.equals("0"))
+                            try{
+                                String[] normal = titles.get(i).text().split(price);
+                                String[] American = titles.get(i).text().split(AmericanPrice);
+
+                                if(American.length >= 2){
+                                    if(realPrice(American) == 0){
                                         price = "0";
-                                    else
-                                        price = ("₩ "+price+" (KRW)");
-                                }
-                                else{
-                                    if(price.equals("0"))
+                                    }else if(realPrice(American) == 1){
+                                        if(price.equals("0")){
+                                            checkCost = true;
+                                            price = "0";
+                                        }
+                                        else{
+                                            checkCost = true;
+                                            price = ("₩ "+price+" (KRW)");
+                                        }
+                                    }
+                                    else{
+                                        if(price.equals("0")){
+                                            checkCost = true;
+                                            price = "0";
+                                        }
+                                        else{
+                                            checkCost = true;
+                                            price = ("$ " + price + " (USD)");
+                                        }
+                                    }
+                                }else if(normal.length >= 2){
+                                    if(realPrice(normal) == 0){
                                         price = "0";
-                                    else
-                                        price = ("$ " + price + " (USD)");
-                                }
-                            }else if(normal.length >= 2){
-                                if(realPrice(normal) == 0){
-                                    price = "0";
-                                }else if(realPrice(normal) == 1){
-                                    if(price.equals("0"))
-                                        price = "0";
-                                    else
-                                        price = ("₩ "+price+" (KRW)");
+                                    }else if(realPrice(normal) == 1){
+                                        if(price.equals("0")) {
+                                            checkCost = true;
+                                            price = "0";
+                                        }
+                                        else{
+                                            checkCost = true;
+                                            price = ("₩ "+price+" (KRW)");
+                                        }
+                                    }else{
+                                        if(price.equals("0")){
+                                            checkCost = true;
+                                            price = "0";
+                                        }
+                                        else{
+                                            checkCost = true;
+                                            price = ("$ " + price + " (USD)");
+                                        }
+                                    }
+                                }else if(square > 0){
+                                    price = total.setScale(0, RoundingMode.DOWN).toString();
+                                    price = ("₩ "+price+" (KRW)");
+                                    checkCost = true;
                                 }else{
-                                    if(price.equals("0"))
-                                        price = "0";
-                                    else
-                                        price = ("$ " + price + " (USD)");
+                                    price = "0";
+                                    checkCost = true;
                                 }
-                            }else if(square > 0){
-                                price = total.setScale(0, RoundingMode.DOWN).toString();
-                                price = ("₩ "+price+" (KRW)");
-                            }else{
+                            }catch (Exception e){
                                 price = "0";
+                                checkCost = true;
                             }
-                        }catch (Exception e){
+                        }else{
                             price = "0";
+                            checkCost = true;
                         }
-
-                        String headCuttedTitle = removeHead(titles.get(i).text());
-                        listCost.add(price);
-                        listTitle.add(headCuttedTitle);
-                        postNumber = Integer.parseInt(censored[censored.length-1]);
-                        listUrl.add(censored[censored.length-1]);
-                    }else{
-                        String headCuttedTitle = removeHead(titles.get(i).text());
-                        listCost.add("0");
-                        listTitle.add(headCuttedTitle);
-                        postNumber = Integer.parseInt(censored[censored.length-1]);
-                        listUrl.add(censored[censored.length-1]);
                     }
+                    String headCuttedTitle = removeHead(titles.get(i).text());
+                    listCost.add(price);
+                    listTitle.add(headCuttedTitle);
+                    postNumber = Integer.parseInt(censored[censored.length-1]);
+                    listUrl.add(censored[censored.length-1]);
                 }
             }
             inputDB("3", listTitle, listCost, listUrl);
@@ -282,14 +314,15 @@ public class WebCrawlerService {
         }
     }
 
-    private ArrayList<ruilwebCost> getCost(String title) {
+    private ArrayList<ruilwebCost> getCost(String title, int index) {
         System.out.println("타이틀: "+title);
         int square = 0;
         StringBuilder sb = new StringBuilder();
         boolean foundNumber = false;
         boolean foundUnit = false;
+        int numberidx = -1;
 
-        for (int i = title.length() - 1; i >= 0; i--) {
+        for (int i = index - 1; i >= 0; i--) {
             char c = title.charAt(i);
             if (Character.isDigit(c)) {
                 sb.insert(0, c);
@@ -297,9 +330,9 @@ public class WebCrawlerService {
             } else if (c == ',' && foundNumber) {
                 continue;  // 숫자 사이의 쉼표는 무시
             } else if (!foundNumber) {
-                int index = checkUnit(c);
+                int unitIndex = checkUnit(c);
                 if (index > -1) {
-                    square += index;
+                    square += unitIndex;
                     foundUnit = true;
                 } else if (c == '.' && foundUnit) {
                     sb.insert(0, c);
@@ -309,6 +342,7 @@ public class WebCrawlerService {
                     if(c == '.'){
                         sb.insert(0, c);
                     }else{
+                        numberidx = i;
                         break;
                     }
                 }
@@ -321,14 +355,14 @@ public class WebCrawlerService {
         if (!numberStr.isEmpty() && !numberStr.equals(".")) {
             try {
                 BigDecimal value = new BigDecimal(numberStr);
-                result.add(new ruilwebCost(value, square));
+                result.add(new ruilwebCost(value, square, numberidx));
             } catch (NumberFormatException e) {
                 BigDecimal value = new BigDecimal("0");
-                result.add(new ruilwebCost(value, 0));
+                result.add(new ruilwebCost(value, 0, numberidx));
             }
         } else {
-            BigDecimal value = new BigDecimal("0");
-            result.add(new ruilwebCost(value, 0));
+            BigDecimal value = new BigDecimal("-1");
+            result.add(new ruilwebCost(value, 0, numberidx));
         }
 
         return result;
@@ -336,7 +370,7 @@ public class WebCrawlerService {
 
     public int checkUnit(char c){
         char[] unit = {'일', '십', '백', '천', '만'};
-        int index = -1;
+        int index = 0;
 
         for(int i = 0 ; i < unit.length ; i++){
             if(unit[i] == c) index = i;
