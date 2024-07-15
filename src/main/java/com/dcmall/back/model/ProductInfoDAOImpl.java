@@ -10,13 +10,9 @@ import java.util.List;
 
 @Repository
 public class ProductInfoDAOImpl implements ProductInfoDAO {
-
-    private final SqlSessionTemplate masterSqlSession;
-
     @Autowired
-    public ProductInfoDAOImpl(@Qualifier("masterSqlSessionTemplate") SqlSessionTemplate masterSqlSession){
-        this.masterSqlSession = masterSqlSession;
-    }
+    @Qualifier("mySqlSessionTemplate")
+    private SqlSessionTemplate sqlSessionTemplate;
     @Override
     public int insertProduct(String id, String title,String cost, String url){
         HashMap<String, String> hashMap = new HashMap<>(){{
@@ -26,7 +22,7 @@ public class ProductInfoDAOImpl implements ProductInfoDAO {
             put("url", url);
         }};
 
-        return masterSqlSession.insert("insertProduct", hashMap);
+        return sqlSessionTemplate.insert("insertProduct", hashMap);
     }
 
     /**
@@ -35,6 +31,6 @@ public class ProductInfoDAOImpl implements ProductInfoDAO {
      */
     @Override
     public String selectProduct(int id) {
-        return masterSqlSession.selectOne("selectProduct", id);
+        return sqlSessionTemplate.selectOne("selectProduct", id);
     }
 }

@@ -2,14 +2,9 @@ package com.dcmall.back.Controller;
 
 import com.dcmall.back.Service.WebCrawlerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /*
 <a href="/bbs/qb_saleinfo/views/1609772" class="subject-link " style="display: block;">
@@ -19,17 +14,14 @@ import java.util.List;
 public class WebController {
     @Autowired
     public WebCrawlerService webCrawlerService;
-    @Autowired
-    private com.dcmall.back.model.embedDAOImpl embedDAOImpl;
 
     @GetMapping("/scrape")
     public String scrape() {
+
         try {
-            String test = embedDAOImpl.emdbed();
-            System.out.println("test" + test);
-            System.out.println("aaa");
-            //webCrawlerService.scrapequasarzone("https://quasarzone.com/bbs/qb_saleinfo");
-            webCrawlerService.scrapefmrkorea("https://www.fmkorea.com/hotdeal");
+            webCrawlerService.scrapeQuasarzone("https://quasarzone.com/bbs/qb_saleinfo");
+            //webCrawlerService.scrapefmkorea("https://www.fmkorea.com/hotdeal");
+            //webCrawlerService.scrapeRuliWeb("https://m.ruliweb.com/market/board/1020");
             return "Complete";
         } catch (Exception e) {
             System.out.println("퀘이사 크롤링 컨트롤 오류");

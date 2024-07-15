@@ -10,15 +10,12 @@ import java.util.List;
 @Repository
 public class UserDAOImpl implements UserDAO {
 
-    private final SqlSessionTemplate masterSqlSession;
-
     @Autowired
-    public UserDAOImpl(@Qualifier("masterSqlSessionTemplate") SqlSessionTemplate masterSqlSession){
-        this.masterSqlSession = masterSqlSession;
-    }
+    @Qualifier("mySqlSessionTemplate")
+    private SqlSessionTemplate sqlSessionTemplate;
 
     @Override
     public List<UserDTO> selectUser() {
-        return masterSqlSession.selectList("selectUser");
+        return sqlSessionTemplate.selectList("selectUser");
     }
 }

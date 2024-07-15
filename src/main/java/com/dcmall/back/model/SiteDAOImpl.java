@@ -9,15 +9,12 @@ import java.util.List;
 
 @Repository
 public class SiteDAOImpl implements SiteDAO{
-    private final SqlSessionTemplate masterSqlSession;
-
     @Autowired
-    public SiteDAOImpl(@Qualifier("masterSqlSessionTemplate") SqlSessionTemplate masterSqlSession){
-        this.masterSqlSession = masterSqlSession;
-    }
+    @Qualifier("mySqlSessionTemplate")
+    private SqlSessionTemplate sqlSessionTemplate;
 
     @Override
     public List<SiteDTO> SelectSite(int id) {
-        return masterSqlSession.selectList("selectUser");
+        return sqlSessionTemplate.selectList("selectUser");
     }
 }
