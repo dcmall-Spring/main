@@ -71,6 +71,7 @@ public class WebCrawlerService {
                 if (Integer.parseInt(urls.get(i).attr("href").substring(23)) > postNumber) {
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String[] title = titles.get(i).text().split("]");
+                    deleteCost(title., cost);
                     listTitle.add(titles.get(i).text().split("]")[1]);
                     listUrl.add(urls.get(i).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
