@@ -4,6 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+    <!-- typeAliases는 typeHandlers보다 앞에 위치할 수 있습니다. -->
     <typeAliases>
         <typeAlias type="com.dcmall.back.model.UserDTO" alias="UserDTO"/>
         <typeAlias type="com.dcmall.back.model.ProductInfoDTO" alias="ProductInfoDTO"/>
@@ -11,7 +12,8 @@
     </typeAliases>
 
     <mappers>
-        <mapper resource="mapper/user.xml"/>
-        <mapper resource="mapper/productinfo.xml"/>
+        <mapper resource="mapper/mysql/productinfo.xml"/>
+        <mapper resource="mapper/mysql/site.xml"/>
+        <mapper resource="mapper/mysql/user.xml"/>
     </mappers>
 </configuration>
