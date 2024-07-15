@@ -5,6 +5,7 @@ import com.dcmall.back.model.embedDAO;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 @Service
 public class WebCrawlerService {
@@ -225,6 +227,50 @@ public class WebCrawlerService {
         }
     }
 
+    public void scrapeArcalive(String url) throws IOException {
+        ArrayList<String> listTitle = new ArrayList<>();
+        ArrayList<String> listUrl = new ArrayList<>();
+        ArrayList<String> listCost = new ArrayList<>();
+        String product = this.dao.selectProduct(4);
+
+        int postNumber = 0;
+
+        if (product != null) {
+            postNumber = Integer.parseInt(product);
+        }
+
+        try{
+            Document doc = Jsoup.connect(url).get();
+            Elements row = doc.select("div.vrow-inner:not(:has(div.vrow-top.deal.deal-close))");
+            for(int i = row.size()-1 ; i >= 0 ; i--){
+                try {
+                    System.out.println("타이틀 " + Objects.requireNonNull(row.get(i).select("a.title.hybrid-title").first()).ownText().trim());
+                    System.out.println("가격 " + row.get(i).select("span.deal-price").text());
+                    System.out.println("");
+                } catch(Exception e) {
+                    System.out.println("error : " + e);
+                }
+
+//                String info = row.get(i).text();
+//                String[] result = seperateArcaLive(info.split(" "));
+//
+//                String post = row.get(i).select("a.title.hybrid-title").attr("href");
+//                String[] postSplit = post.split("/");
+//                String[] realPost = postSplit[postSplit.length-1].split("\\?");
+//
+//                listTitle.add(result[0]);
+//                listCost.add(result[1]);
+//                listUrl.add(realPost[0]);
+            }
+            //inputDB("4", listTitle, listCost, listUrl);
+            System.out.println("test");
+
+        }catch(Exception e){
+            e.printStackTrace();
+            System.out.println("아카라이브 스크랩 오류: "+e.getMessage());
+        }
+    }
+
     private ArrayList<ruilwebCost> getCost(String title) {
         System.out.println("타이틀: "+title);
         int square = 0;
@@ -309,5 +355,25 @@ public class WebCrawlerService {
 
             dao.insertProduct(siteNumber, listTitle.get(i), listCost.get(i), listUrl.get(i));
         }
+    }
+
+    private String[] seperateArcaLive (String[] splitStr){
+        String[] result = new String[2];
+        StringBuilder title = new StringBuilder();
+        StringBuilder price = new StringBuilder(splitStr[splitStr.length-6]);
+        if(price.charAt(0) == '$'){
+            price.insert(0, "$ ");
+            price.insert(price.length(), " (USD)");
+        }else if(price.charAt(0) == '¥'){
+
+        }
+
+        for(int i = splitStr.length-8 ; i >= 3 ; i--){
+            title.insert(0, " "+splitStr[i]);
+        }
+        result[0] = title.toString();
+        result[1] = price.toString();
+
+        return result;
     }
 }
