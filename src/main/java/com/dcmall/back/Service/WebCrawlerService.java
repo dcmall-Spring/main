@@ -185,8 +185,10 @@ public class WebCrawlerService {
                                 String[] American = titles.get(i).text().split(AmericanPrice);
 
                                 if(American.length >= 2){
-                                    if(realPrice(American) == 0){
-                                        price = "0";
+                                    if(realPrice(American) == 0 && price.length() >= 4){
+                                        //price = "0";
+                                        checkCost = true;
+                                        price = ("₩ "+price+" (KRW)");
                                     }else if(realPrice(American) == 1){
                                         if(price.equals("0")){
                                             checkCost = true;
@@ -197,7 +199,7 @@ public class WebCrawlerService {
                                             price = ("₩ "+price+" (KRW)");
                                         }
                                     }
-                                    else{
+                                    else if(realPrice(American) == 2){
                                         if(price.equals("0")){
                                             checkCost = true;
                                             price = "0";
@@ -219,7 +221,7 @@ public class WebCrawlerService {
                                             checkCost = true;
                                             price = ("₩ "+price+" (KRW)");
                                         }
-                                    }else{
+                                    }else if(realPrice(normal) == 2){
                                         if(price.equals("0")){
                                             checkCost = true;
                                             price = "0";
