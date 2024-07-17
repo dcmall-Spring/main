@@ -232,7 +232,7 @@ public class WebCrawlerService {
                                             checkCost = true;
                                             price = ("$ " + price + " (USD)");
                                         }
-                                    } else if(realPrice(American) == -1){
+                                    } else if(realPrice(normal) == -1){
                                         price = "0";
                                     }
                                 }else if(square > 0){
