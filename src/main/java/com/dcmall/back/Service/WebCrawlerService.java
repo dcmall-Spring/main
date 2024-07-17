@@ -409,7 +409,8 @@ public class WebCrawlerService {
                 (ch == 'p' || ch == 'P') ||
                 (ch == 'f' || ch == 'F') ||
                 (ch == 'b' || ch == 'B') ||
-                (ch == 't' || ch == 'T');
+                (ch == 't' || ch == 'T') ||
+                (ch == '%');
     }
 
     private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
