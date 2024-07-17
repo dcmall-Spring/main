@@ -254,6 +254,7 @@ public class WebCrawlerService {
                 }
             }
             inputDB("3", listTitle, listCost, listUrl);
+            System.out.println("루리웹 크롤링 성공!");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("루리웹 오류: " + e.getMessage());
@@ -315,7 +316,6 @@ public class WebCrawlerService {
     }
 
     private ArrayList<ruilwebCost> getCost(String title, int index) {
-        System.out.println("타이틀: "+title);
         int square = 0;
         StringBuilder sb = new StringBuilder();
         boolean foundNumber = false;
