@@ -208,6 +208,8 @@ public class WebCrawlerService {
                                             checkCost = true;
                                             price = ("$ " + price + " (USD)");
                                         }
+                                    } else if(realPrice(American) == -1){
+                                        price = "0";
                                     }
                                 }else if(normal.length >= 2){
                                     if(realPrice(normal) == 0){
@@ -230,6 +232,8 @@ public class WebCrawlerService {
                                             checkCost = true;
                                             price = ("$ " + price + " (USD)");
                                         }
+                                    } else if(realPrice(American) == -1){
+                                        price = "0";
                                     }
                                 }else if(square > 0){
                                     price = total.setScale(0, RoundingMode.DOWN).toString();
@@ -385,9 +389,27 @@ public class WebCrawlerService {
             return 1;
         }else if(arr[arr.length-2].charAt(arr[arr.length-2].length()-1) == '$' ||(arr[arr.length-1].charAt(0) == '달' && arr[arr.length-1].charAt(1) == '러')){ //달러 2
             return 2;
-        }
+        }else if(isUnit(arr[arr.length-1].charAt(0))) return -1;
 
         return 0;
+    }
+    private boolean isUnit(char ch) {
+        return (ch == 'm' || ch == 'M') ||
+                (ch == 'g' || ch == 'G') ||
+                (ch == 'k' || ch == 'K') ||
+                (ch == 'l' || ch == 'L') ||
+                (ch == 'c' || ch == 'C') ||
+                (ch == 'n' || ch == 'N') ||
+                (ch == 'a' || ch == 'A') ||
+                (ch == 'v' || ch == 'V') ||
+                (ch == 'h' || ch == 'H') ||
+                (ch == 's' || ch == 'S') ||
+                (ch == 'w' || ch == 'W') ||
+                (ch == 'j' || ch == 'J') ||
+                (ch == 'p' || ch == 'P') ||
+                (ch == 'f' || ch == 'F') ||
+                (ch == 'b' || ch == 'B') ||
+                (ch == 't' || ch == 'T');
     }
 
     private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
