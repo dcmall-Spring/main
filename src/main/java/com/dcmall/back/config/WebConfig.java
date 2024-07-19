@@ -13,7 +13,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")  // Next.js가 실행되는 주소
+                        .allowedOrigins("http://localhost:3000/api/postapi")  // Next.js가 실행되는 주소
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
             }
         };
