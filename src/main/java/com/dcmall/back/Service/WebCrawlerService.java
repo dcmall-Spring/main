@@ -68,6 +68,10 @@ public class WebCrawlerService {
 
         try {
             Document doc = Jsoup.connect(url).get();
+            /*
+                title 을 [ ( 등 나올떄 글자를 한글자 씩 잘라 cost 가격과 일치하는 것이 있는지 확인 있을시 [ ( 괄호 안의 내용 제거 함수로 만들기
+             */
+            // subject-link 클래스를 가진 요소 선택
             Elements titles = doc.select(".subject-link .ellipsis-with-reply-cnt, .subject-link .fa.fa-lock");
             Elements urls = doc.select(".subject-link");
             Elements costs = doc.select(".text-orange");
@@ -275,7 +279,17 @@ public class WebCrawlerService {
                             checkCost = true;
                         }
                     }
-                    String headCuttedTitle = removeHead(titles.get(i).text());
+                    String costCutTitle = "";
+                    System.out.println("before: "+titles.get(i).text());
+                    if(titles.get(i).text().contains(price)){
+                        costCutTitle = deleteCost(titles.get(i).text(), price);
+                    }else if(titles.get(i).text().contains(NumberFormat.getInstance().format(total))){
+                        costCutTitle = deleteCost(titles.get(i).text(), NumberFormat.getInstance().format(total));
+                    }
+                    System.out.println("after: "+costCutTitle);
+                    String headCuttedTitle = removeHead(costCutTitle);
+                    System.out.println("headCut after: "+headCuttedTitle+"\n");
+
                     listCost.add(price);
                     listTitle.add(headCuttedTitle);
                     postNumber = Integer.parseInt(censored[censored.length-1]);
@@ -486,6 +500,7 @@ public class WebCrawlerService {
                     if(costCheck >= formattedNumber.length()){
                         break;
                     }
+                    System.out.println("현재값 : " + title);
                     if(deleteCommas.length() > costCheck){
                         if(costEqual.charAt(j) == deleteCommas.charAt(costCheck)){
                             costCheck++;
@@ -503,31 +518,42 @@ public class WebCrawlerService {
                 }
                 if(costCheck == formattedNumber.length() || costCheck == deleteCommas.length()){
                     String firstTitle = title.substring(0, start);
-                    firstTitle += title.substring(end, title.length() - 1);
+                    firstTitle += title.substring(end, title.length());
                     title = firstTitle;
                 }
                 start = -1;
             }
         }
-
+        System.out.println("함수안 : "  + title);
         return title;
     }
 
     private String removeHead(String title) {
+        if (title.isEmpty()) {
+            return title;
+        }
+
         if (title.charAt(0) == '[') {
             int firstCloseBracket = title.indexOf(']');
-            // 첫 번째 ']' 이후의 문자열을 가져옴
-            String remainingTitle = title.substring(firstCloseBracket + 1).trim();
+            // 닫는 대괄호가 있는지 확인
+            if (firstCloseBracket != -1) {
+                // 첫 번째 닫는 대괄호 이후의 문자열을 가져오고 앞뒤 공백을 제거
+                String remainingTitle = title.substring(firstCloseBracket + 1).trim();
 
-            // 남은 문자열이 비어있지 않고 '['로 시작하면 그대로 반환
-            if (!remainingTitle.isEmpty() && remainingTitle.charAt(0) == '[') {
+                // 남은 문자열이 비어있지 않고 '['로 시작하면 그대로 반환
+                if (!remainingTitle.isEmpty() && remainingTitle.charAt(0) == '[') {
+                    return remainingTitle;
+                }
+
+                // 그 외의 경우, 남은 문자열을 반환
                 return remainingTitle;
+            } else {
+                // 닫는 대괄호가 없는 경우, 원래 문자열을 반환
+                return title;
             }
-
-            // 그 외의 경우, 남은 문자열을 반환
-            return remainingTitle;
         } else {
             return title;
         }
     }
+
 }
