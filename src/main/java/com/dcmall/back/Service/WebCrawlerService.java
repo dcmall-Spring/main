@@ -282,19 +282,16 @@ public class WebCrawlerService {
                             checkCost = true;
                         }
                     }
-                    String costCutTitle = "";
-                    System.out.println("before: "+titles.get(i).text());
-                    if(titles.get(i).text().contains(price)){
-                        costCutTitle = deleteCost(titles.get(i).text(), price);
-                    }else if(titles.get(i).text().contains(NumberFormat.getInstance().format(total))){
-                        costCutTitle = deleteCost(titles.get(i).text(), NumberFormat.getInstance().format(total));
+                    String costCutTitle = removeHead(titles.get(i).text());
+
+                    if(costCutTitle.contains(price)){
+                        costCutTitle = deleteCost(costCutTitle, price);
+                    }else if(costCutTitle.contains(NumberFormat.getInstance().format(total))){
+                        costCutTitle = deleteCost(costCutTitle, NumberFormat.getInstance().format(total));
                     }
-                    System.out.println("after: "+costCutTitle);
-                    String headCuttedTitle = removeHead(costCutTitle);
-                    System.out.println("headCut after: "+headCuttedTitle+"\n");
 
                     listCost.add(price);
-                    listTitle.add(headCuttedTitle);
+                    listTitle.add(costCutTitle);
                     postNumber = Integer.parseInt(censored[censored.length-1]);
                     listUrl.add(censored[censored.length-1]);
                 }
@@ -467,6 +464,9 @@ public class WebCrawlerService {
     }
 
     public String deleteCost(String title, String cost) {
+        if(!title.contains("(") && !title.contains("[")){
+            return title;
+        }
 
         String deleteCommas = cost.replaceAll(",", "");
         double number = Double.parseDouble(deleteCommas);
