@@ -68,10 +68,6 @@ public class WebCrawlerService {
 
         try {
             Document doc = Jsoup.connect(url).get();
-            /*
-                title 을 [ ( 등 나올떄 글자를 한글자 씩 잘라 cost 가격과 일치하는 것이 있는지 확인 있을시 [ ( 괄호 안의 내용 제거 함수로 만들기
-             */
-            // subject-link 클래스를 가진 요소 선택
             Elements titles = doc.select(".subject-link .ellipsis-with-reply-cnt, .subject-link .fa.fa-lock");
             Elements urls = doc.select(".subject-link");
             Elements costs = doc.select(".text-orange");
@@ -79,8 +75,6 @@ public class WebCrawlerService {
                 if (Integer.parseInt(urls.get(i + 3).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String title = titles.get(i).text().replaceFirst("^\\[.*?\\]\\s*", "");
-                    System.out.println("title : " + title);
-                    System.out.println("");
                     String titleQuasa = deleteCost(title, cost);
                     listTitle.add(titleQuasa);
                     listUrl.add(urls.get(i + 3).attr("href").substring(23));
@@ -95,7 +89,6 @@ public class WebCrawlerService {
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
-            System.out.println(e);
         }
     }
 
@@ -458,8 +451,6 @@ public class WebCrawlerService {
 
     public String deleteCost(String title, String cost) {
 
-        ArrayList<String> result = new ArrayList<>();
-
         String deleteCommas = cost.replaceAll(",", "");
         double number = Double.parseDouble(deleteCommas);
         String formattedNumber;
@@ -473,7 +464,10 @@ public class WebCrawlerService {
 
         int costCheck = 0;
 
+        int end = 0;
+
         String endwith =  title.substring(title.length() - 3);
+
         for(int i = 1 ; i < title.length() ; i++){
             if(title.charAt(i) == '[' || title.charAt(i) == '('){
                 start = i;
@@ -484,6 +478,7 @@ public class WebCrawlerService {
                     costEqual = title.substring(start + 1, count).trim();
                 } else {
                     costEqual = title.substring(start + 1, i).trim();
+                    end = i + 1;
                 }
 
                 for(int j = 0; j < costEqual.length(); j++){
@@ -491,7 +486,6 @@ public class WebCrawlerService {
                     if(costCheck >= formattedNumber.length()){
                         break;
                     }
-                    System.out.println("현재값 : " + title);
                     if(deleteCommas.length() > costCheck){
                         if(costEqual.charAt(j) == deleteCommas.charAt(costCheck)){
                             costCheck++;
@@ -508,7 +502,9 @@ public class WebCrawlerService {
                     }
                 }
                 if(costCheck == formattedNumber.length() || costCheck == deleteCommas.length()){
-                    title = title.substring(0, start);
+                    String firstTitle = title.substring(0, start);
+                    firstTitle += title.substring(end, title.length() - 1);
+                    title = firstTitle;
                 }
                 start = -1;
             }

@@ -19,9 +19,9 @@ public class WebController {
     public String scrape() {
 
         try {
-            webCrawlerService.scrapeQuasarzone("https://quasarzone.com/bbs/qb_saleinfo");
+            //webCrawlerService.scrapeQuasarzone("https://quasarzone.com/bbs/qb_saleinfo");
             //webCrawlerService.scrapefmkorea("https://www.fmkorea.com/hotdeal");
-            webCrawlerService.scrapeRuliWeb("https://m.ruliweb.com/market/board/1020");
+            webCrawlerService.scrapeRuliWeb("https://bbs.ruliweb.com/market/board/1020");
             //webCrawlerService.scrapeArcalive("https://arca.live/b/hotdeal");
             return "Complete";
         } catch (Exception e) {
