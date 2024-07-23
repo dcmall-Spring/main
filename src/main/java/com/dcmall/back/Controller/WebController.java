@@ -19,7 +19,7 @@ public class WebController {
     public String scrape() {
 
         try {
-            webCrawlerService.scrapeQuasarzone("https://quasarzone.com/bbs/qb_saleinfo");
+            //webCrawlerService.scrapeQuasarzone("https://quasarzone.com/bbs/qb_saleinfo");
             //webCrawlerService.scrapefmkorea("https://www.fmkorea.com/hotdeal");
             webCrawlerService.scrapeRuliWeb("https://m.ruliweb.com/market/board/1020");
             return "Complete";

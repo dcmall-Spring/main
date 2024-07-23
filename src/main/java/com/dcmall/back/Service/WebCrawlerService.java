@@ -282,7 +282,17 @@ public class WebCrawlerService {
                             checkCost = true;
                         }
                     }
-                    String headCuttedTitle = removeHead(titles.get(i).text());
+                    String costCutTitle = "";
+                    System.out.println("before: "+titles.get(i).text());
+                    if(titles.get(i).text().contains(price)){
+                        costCutTitle = deleteCost(titles.get(i).text(), price);
+                    }else if(titles.get(i).text().contains(NumberFormat.getInstance().format(total))){
+                        costCutTitle = deleteCost(titles.get(i).text(), NumberFormat.getInstance().format(total));
+                    }
+                    System.out.println("after: "+costCutTitle);
+                    String headCuttedTitle = removeHead(costCutTitle);
+                    System.out.println("headCut after: "+headCuttedTitle+"\n");
+
                     listCost.add(price);
                     listTitle.add(headCuttedTitle);
                     postNumber = Integer.parseInt(censored[censored.length-1]);
@@ -458,8 +468,6 @@ public class WebCrawlerService {
 
     public String deleteCost(String title, String cost) {
 
-        ArrayList<String> result = new ArrayList<>();
-
         String deleteCommas = cost.replaceAll(",", "");
         double number = Double.parseDouble(deleteCommas);
         String formattedNumber;
@@ -473,6 +481,8 @@ public class WebCrawlerService {
 
         int costCheck = 0;
 
+        int end = 0;
+
         String endwith =  title.substring(title.length() - 3);
         for(int i = 1 ; i < title.length() ; i++){
             if(title.charAt(i) == '[' || title.charAt(i) == '('){
@@ -484,6 +494,7 @@ public class WebCrawlerService {
                     costEqual = title.substring(start + 1, count).trim();
                 } else {
                     costEqual = title.substring(start + 1, i).trim();
+                    end = i + 1;
                 }
 
                 for(int j = 0; j < costEqual.length(); j++){
@@ -491,7 +502,6 @@ public class WebCrawlerService {
                     if(costCheck >= formattedNumber.length()){
                         break;
                     }
-                    System.out.println("현재값 : " + title);
                     if(deleteCommas.length() > costCheck){
                         if(costEqual.charAt(j) == deleteCommas.charAt(costCheck)){
                             costCheck++;
@@ -508,7 +518,9 @@ public class WebCrawlerService {
                     }
                 }
                 if(costCheck == formattedNumber.length() || costCheck == deleteCommas.length()){
-                    title = title.substring(0, start);
+                    String firstTitle = title.substring(0, start);
+                    firstTitle += title.substring(end, title.length());
+                    title = firstTitle;
                 }
                 start = -1;
             }
@@ -518,20 +530,31 @@ public class WebCrawlerService {
     }
 
     private String removeHead(String title) {
+        if (title.isEmpty()) {
+            return title;
+        }
+
         if (title.charAt(0) == '[') {
             int firstCloseBracket = title.indexOf(']');
-            // 첫 번째 ']' 이후의 문자열을 가져옴
-            String remainingTitle = title.substring(firstCloseBracket + 1).trim();
+            // 닫는 대괄호가 있는지 확인
+            if (firstCloseBracket != -1) {
+                // 첫 번째 닫는 대괄호 이후의 문자열을 가져오고 앞뒤 공백을 제거
+                String remainingTitle = title.substring(firstCloseBracket + 1).trim();
 
-            // 남은 문자열이 비어있지 않고 '['로 시작하면 그대로 반환
-            if (!remainingTitle.isEmpty() && remainingTitle.charAt(0) == '[') {
+                // 남은 문자열이 비어있지 않고 '['로 시작하면 그대로 반환
+                if (!remainingTitle.isEmpty() && remainingTitle.charAt(0) == '[') {
+                    return remainingTitle;
+                }
+
+                // 그 외의 경우, 남은 문자열을 반환
                 return remainingTitle;
+            } else {
+                // 닫는 대괄호가 없는 경우, 원래 문자열을 반환
+                return title;
             }
-
-            // 그 외의 경우, 남은 문자열을 반환
-            return remainingTitle;
         } else {
             return title;
         }
     }
+
 }
