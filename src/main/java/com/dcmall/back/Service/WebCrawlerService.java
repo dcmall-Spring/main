@@ -216,10 +216,13 @@ public class WebCrawlerService {
                                 String[] American = titles.get(i).text().split(AmericanPrice);
 
                                 if(American.length >= 1){
-                                    if(realPrice(American) == 0 && price.length() >= 4 && !price.contains(".")){
-                                        //price = "0";
-                                        checkCost = true;
-                                        price = ("₩ "+price+" (KRW)");
+                                    if(realPrice(American) == 0 && price.length() >= 4){
+                                        if(!price.contains(".")){
+                                            checkCost = true;
+                                            price = ("₩ "+price+" (KRW)");
+                                        }else{
+                                            price = "0";
+                                        }
                                     }else if(realPrice(American) == 1){
                                         if(price.equals("0")){
                                             checkCost = true;
