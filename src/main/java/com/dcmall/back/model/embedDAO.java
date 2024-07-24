@@ -7,5 +7,5 @@ public interface embedDAO {
 
     List<embedDTO> selectEmbed();
 
-    String isExist(String title);
+    boolean isExist(String title);
 }
