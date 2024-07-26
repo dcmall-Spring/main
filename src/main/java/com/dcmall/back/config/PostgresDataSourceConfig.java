@@ -44,82 +44,13 @@ MyBatis는 데이터 소스를 통해 데이터베이스와 연결하고 SQL 쿼
     생성된 SqlSessionFactory는 MyBatis가 SQL 세션을 생성하고 데이터베이스와 상호작용하는 데 사용됩니다.
     DataSourceTransactionManager와 SqlSessionTemplate도 설정하여 트랜잭션 관리 및 SQL 세션 관리를 지원합니다.
 
-기본 DataSource는 기본적으로 HikariCP의 기본 설정을 따라간다.
-hikariConfig로 설정을 좀 더 구체적으로 해준 것에 불과 PreparedStatement 문제 해결에 직접적인 영향은 줄 수 없다.
-설정을 안 해도 그만이지만, 조금 더 나은 환경을 위해 설정 해준 것.
-나중에 불필요하면 날리자...
  */
 @Configuration
 public class PostgresDataSourceConfig {
-    @Value("${postgres.datasource.jdbc-url}")
-    private String jdbcUrl;
-    @Value("${postgres.datasource.username}")
-    private String username;
-    @Value("${postgres.datasource.password}")
-    private String password;
-    @Value("${postgres.datasource.driver-class-name}")
-    private String driverClassName;
-    @Value("${postgres.datasource.hikari.maximum-pool-size}")
-    private int maximumPoolSize;
-    @Value("${postgres.datasource.hikari.minimum-idle}")
-    private int minimumIdle;
-    @Value("${postgres.datasource.hikari.idle-timeout}")
-    private long idleTimeout;
-    @Value("${postgres.datasource.hikari.max-lifetime}")
-    private long maxLifetime;
-    @Value("${postgres.datasource.hikari.connection-timeout}")
-    private long connectionTimeout;
-    @Value("${postgres.datasource.hikari.data-source-properties.cachePrepStmts}")
-    private boolean cachePrepStmts;
-    @Value("${postgres.datasource.hikari.data-source-properties.prepStmtCacheSize}")
-    private int prepStmtCacheSize;
-    @Value("${postgres.datasource.hikari.data-source-properties.prepStmtCacheSqlLimit}")
-    private int prepStmtCacheSqlLimit;
-    @Value("${postgres.datasource.hikari.data-source-properties.useServerPrepStmts}")
-    private boolean useServerPrepStmts;
 
     @Bean(name = "postgresDataSource")
+    @ConfigurationProperties(prefix = "postgres.datasource")
     public DataSource postgresDataSource() {
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(jdbcUrl);        // 데이터베이스 연결 URL 설정
-        hikariConfig.setUsername(username);      // 데이터베이스 접속 사용자명
-        hikariConfig.setPassword(password);      // 데이터베이스 접속 비밀번호
-        hikariConfig.setDriverClassName(driverClassName);  // JDBC 드라이버 클래스명
-
-        hikariConfig.setMaximumPoolSize(maximumPoolSize);
-        // 동시에 유지할 수 있는 최대 커넥션 수. 높으면 동시 처리 능력 향상, 너무 높으면 DB 부하 증가
-
-        hikariConfig.setMinimumIdle(minimumIdle);
-        // 유휴(idle) 상태로 유지할 최소 커넥션 수. 커넥션 생성 오버헤드 감소, 너무 높으면 리소스 낭비
-
-        hikariConfig.setIdleTimeout(idleTimeout);
-        // 유휴 커넥션이 풀에서 제거되기까지의 시간(ms). 리소스 효율성과 연결 가용성 사이의 균형
-
-        hikariConfig.setMaxLifetime(maxLifetime);
-        // 커넥션의 최대 수명(ms). 오래된 연결 제거로 안정성 향상, 너무 짧으면 불필요한 재연결 발생
-
-        hikariConfig.setConnectionTimeout(connectionTimeout);
-        // 새 커넥션을 얻기 위해 대기하는 최대 시간(ms). 긴 대기 시간 방지, 너무 짧으면 불필요한 오류 발생
-
-        hikariConfig.addDataSourceProperty("cachePrepStmts", cachePrepStmts);
-        // PreparedStatement 캐시 사용 여부. 활성화 시 반복 쿼리 성능 향상, 메모리 사용량 증가
-
-        hikariConfig.addDataSourceProperty("prepStmtCacheSize", prepStmtCacheSize);
-        // 캐시할 PreparedStatement의 수. 높으면 더 많은 쿼리 캐싱, 메모리 사용량 증가
-
-        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", prepStmtCacheSqlLimit);
-        // 캐시할 SQL 문의 최대 길이. 긴 쿼리도 캐시 가능, 너무 크면 메모리 사용량 증가
-
-        hikariConfig.addDataSourceProperty("useServerPrepStmts", useServerPrepStmts);
-        // 서버 사이드 PreparedStatement 사용 여부. 활성화 시 DB 서버에서 쿼리 최적화, 네트워크 부하 감소
-
-        return new HikariDataSource(hikariConfig);
+        return DataSourceBuilder.create().build();
     }
-
-
-//    @Bean(name = "postgresDataSource")
-//    @ConfigurationProperties(prefix = "postgres.datasource")
-//    public DataSource postgresDataSource() {
-//        return DataSourceBuilder.create().build();
-//    }
 }
