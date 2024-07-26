@@ -18,9 +18,8 @@ public class WebController {
     @GetMapping("/scrape")
     public String scrape() {
 
-        //String url = "https://quasarzone.com/bbs/qb_saleinfo";
         try {
-            //webCrawlerService.scrapeQuasarzone(url);
+            //webCrawlerService.scrapeQuasarzone("https://quasarzone.com/bbs/qb_saleinfo");
             //webCrawlerService.scrapefmkorea("https://www.fmkorea.com/hotdeal");
             //webCrawlerService.scrapeRuliWeb("https://m.ruliweb.com/market/board/1020");
             webCrawlerService.scrapeArcalive("https://arca.live/b/hotdeal/");

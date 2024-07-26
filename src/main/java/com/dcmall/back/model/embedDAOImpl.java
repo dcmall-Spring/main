@@ -20,9 +20,7 @@ public class embedDAOImpl implements embedDAO {
             params.put("title", title);
             params.put("embedding", embedding);
 
-            System.out.println("Inserting data: " + params);
             sqlSessionTemplate.insert("insertEmbed", params);
-            System.out.println("Insert completed successfully.");
         }catch (Exception e) {
             e.printStackTrace();
             System.out.println("Exception 문제: " + e.getMessage());

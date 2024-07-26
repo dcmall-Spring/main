@@ -37,5 +37,9 @@ out/
 ### VS Code ###
 .vscode/
 
+<<<<<<< HEAD
+### DBinfo ###
+=======
 # Ignore application.properties file
+>>>>>>> submain
 src/main/resources/application.properties
