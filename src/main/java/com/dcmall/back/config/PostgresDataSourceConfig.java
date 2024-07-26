@@ -44,72 +44,10 @@ MyBatis는 데이터 소스를 통해 데이터베이스와 연결하고 SQL 쿼
     생성된 SqlSessionFactory는 MyBatis가 SQL 세션을 생성하고 데이터베이스와 상호작용하는 데 사용됩니다.
     DataSourceTransactionManager와 SqlSessionTemplate도 설정하여 트랜잭션 관리 및 SQL 세션 관리를 지원합니다.
 
-PreparedStatement 오류 발생 원인(여기선 제대로 sql이 끝나지 않은 상태에서 다시 똑같은 sql문을 실행했을 때 주로 터졌으니 동시성 문제일 가능성이 높음):
-
-리소스 누수: PreparedStatement가 제대로 닫히지 않고 계속 열려있는 경우
-이름 충돌: 같은 이름의 PreparedStatement가 중복 생성되는 경우
-동시성 문제: 여러 스레드가 동시에 같은 PreparedStatement를 사용하려 할 때
-서버 리소스 부족: 너무 많은 PreparedStatement가 동시에 생성되어 서버 리소스를 고갈시키는 경우
-
-각 설정이 오류를 방지하는 방법:
-
-cachePrepStmts (PreparedStatement 캐싱):
-
-작동 원리: PreparedStatement를 재사용 가능한 형태로 캐시합니다.
-오류 방지: 동일한 쿼리에 대해 새로운 PreparedStatement를 매번 생성하지 않아 리소스 누수와 이름 충돌을 방지합니다.
-
-
-prepStmtCacheSize (PreparedStatement 캐시 크기):
-
-작동 원리: 각 커넥션에서 캐시할 수 있는 PreparedStatement의 수를 제한합니다.
-오류 방지: 과도한 메모리 사용을 방지하고, 적절한 수의 PreparedStatement만 유지하여 서버 리소스 고갈을 막습니다.
-
-
-prepStmtCacheSqlLimit (캐시할 SQL 문의 최대 길이):
-
-작동 원리: 너무 긴 SQL 문은 캐시하지 않도록 제한합니다.
-오류 방지: 메모리 사용을 최적화하고, 비정상적으로 긴 쿼리로 인한 리소스 문제를 방지합니다.
-
-
-useServerPrepStmts (서버 사이드 PreparedStatement 사용):
-
-작동 원리: PreparedStatement를 데이터베이스 서버에서 처리하도록 합니다.
-오류 방지: 클라이언트 측의 PreparedStatement 관리 부담을 줄이고, 서버에서 더 효율적으로 관리하여 동시성 문제를 완화합니다.
-
-
-maximumPoolSize (최대 커넥션 풀 크기):
-
-작동 원리: 동시에 유지할 수 있는 최대 데이터베이스 커넥션 수를 제한합니다.
-오류 방지: 과도한 커넥션 생성을 방지하여 서버 리소스 고갈을 막고, 각 커넥션이 관리하는 PreparedStatement의 수를 간접적으로 제한합니다.
-
-
-minimumIdle (최소 유휴 커넥션 수):
-
-작동 원리: 항상 유지할 최소한의 유휴 커넥션 수를 설정합니다.
-오류 방지: 갑작스러운 요청 증가 시 새 PreparedStatement 생성에 따른 부하를 줄입니다.
-
-
-idleTimeout (유휴 커넥션 타임아웃):
-
-작동 원리: 일정 시간 동안 사용되지 않은 커넥션을 제거합니다.
-오류 방지: 오래된 커넥션과 그에 연관된 PreparedStatement를 정리하여 리소스 누수를 방지합니다.
-
-
-maxLifetime (커넥션 최대 수명):
-
-작동 원리: 커넥션의 최대 수명을 제한합니다.
-오류 방지: 오래된 커넥션을 주기적으로 갱신하여 PreparedStatement 관련 문제가 누적되는 것을 방지합니다.
-
-
-
-이러한 설정들이 조화롭게 작동하면:
-
-PreparedStatement의 생성과 재사용이 효율적으로 관리됩니다.
-리소스 사용이 최적화되어 서버 부하가 줄어듭니다.
-동시성 문제가 완화되어 PreparedStatement 충돌이 감소합니다.
-오래된 리소스가 적절히 정리되어 누수가 방지됩니다.
-
-결과적으로, 이러한 종합적인 접근 방식이 PreparedStatement 관련 오류를 효과적으로 방지하고 전반적인 데이터베이스 연결 성능을 향상시킵니다.
+기본 DataSource는 기본적으로 HikariCP의 기본 설정을 따라간다.
+hikariConfig로 설정을 좀 더 구체적으로 해준 것에 불과 PreparedStatement 문제 해결에 직접적인 영향은 줄 수 없다.
+설정을 안 해도 그만이지만, 조금 더 나은 환경을 위해 설정 해준 것.
+나중에 불필요하면 날리자...
  */
 @Configuration
 public class PostgresDataSourceConfig {
@@ -143,20 +81,37 @@ public class PostgresDataSourceConfig {
     @Bean(name = "postgresDataSource")
     public DataSource postgresDataSource() {
         HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(jdbcUrl);
-        hikariConfig.setUsername(username);
-        hikariConfig.setPassword(password);
-        hikariConfig.setDriverClassName(driverClassName);
+        hikariConfig.setJdbcUrl(jdbcUrl);        // 데이터베이스 연결 URL 설정
+        hikariConfig.setUsername(username);      // 데이터베이스 접속 사용자명
+        hikariConfig.setPassword(password);      // 데이터베이스 접속 비밀번호
+        hikariConfig.setDriverClassName(driverClassName);  // JDBC 드라이버 클래스명
 
-        hikariConfig.setMaximumPoolSize(maximumPoolSize);   //동시 유지할 수 있는 최대 커넥션 수
-        hikariConfig.setMinimumIdle(minimumIdle);   //유휴(idle) 상태로 유지할 최소 커넥션 수
-        hikariConfig.setIdleTimeout(idleTimeout);   //유휴 커넥션이 풀에서 제거 되기까지의 시간
-        hikariConfig.setMaxLifetime(maxLifetime);   //커넥션의 최대 수명
-        hikariConfig.setConnectionTimeout(connectionTimeout); //새 커넥션을 얻기 위해 대기하는 최대 시간을 지정
-        hikariConfig.addDataSourceProperty("cachePrepStmts", cachePrepStmts);   //preparedStatement 캐시 여부
-        hikariConfig.addDataSourceProperty("prepStmtCacheSize", prepStmtCacheSize); //캐시할 preparedStatment의 수
-        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", prepStmtCacheSqlLimit); //캐시할 SQL 문의 최대 길이를 지정합니다.
-        hikariConfig.addDataSourceProperty("useServerPrepStmts", useServerPrepStmts); // 서버 사이드 PreparedStatement 사용 여부를 결정 true로 하면, PreparedStatement가 데이터베이스 서버에서 처리되어 더 효율적인 쿼리 실행이 가능
+        hikariConfig.setMaximumPoolSize(maximumPoolSize);
+        // 동시에 유지할 수 있는 최대 커넥션 수. 높으면 동시 처리 능력 향상, 너무 높으면 DB 부하 증가
+
+        hikariConfig.setMinimumIdle(minimumIdle);
+        // 유휴(idle) 상태로 유지할 최소 커넥션 수. 커넥션 생성 오버헤드 감소, 너무 높으면 리소스 낭비
+
+        hikariConfig.setIdleTimeout(idleTimeout);
+        // 유휴 커넥션이 풀에서 제거되기까지의 시간(ms). 리소스 효율성과 연결 가용성 사이의 균형
+
+        hikariConfig.setMaxLifetime(maxLifetime);
+        // 커넥션의 최대 수명(ms). 오래된 연결 제거로 안정성 향상, 너무 짧으면 불필요한 재연결 발생
+
+        hikariConfig.setConnectionTimeout(connectionTimeout);
+        // 새 커넥션을 얻기 위해 대기하는 최대 시간(ms). 긴 대기 시간 방지, 너무 짧으면 불필요한 오류 발생
+
+        hikariConfig.addDataSourceProperty("cachePrepStmts", cachePrepStmts);
+        // PreparedStatement 캐시 사용 여부. 활성화 시 반복 쿼리 성능 향상, 메모리 사용량 증가
+
+        hikariConfig.addDataSourceProperty("prepStmtCacheSize", prepStmtCacheSize);
+        // 캐시할 PreparedStatement의 수. 높으면 더 많은 쿼리 캐싱, 메모리 사용량 증가
+
+        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", prepStmtCacheSqlLimit);
+        // 캐시할 SQL 문의 최대 길이. 긴 쿼리도 캐시 가능, 너무 크면 메모리 사용량 증가
+
+        hikariConfig.addDataSourceProperty("useServerPrepStmts", useServerPrepStmts);
+        // 서버 사이드 PreparedStatement 사용 여부. 활성화 시 DB 서버에서 쿼리 최적화, 네트워크 부하 감소
 
         return new HikariDataSource(hikariConfig);
     }
