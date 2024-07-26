@@ -113,58 +113,10 @@ PreparedStatement의 생성과 재사용이 효율적으로 관리됩니다.
  */
 @Configuration
 public class PostgresDataSourceConfig {
-    @Value("${postgres.datasource.jdbc-url}")
-    private String jdbcUrl;
-    @Value("${postgres.datasource.username}")
-    private String username;
-    @Value("${postgres.datasource.password}")
-    private String password;
-    @Value("${postgres.datasource.driver-class-name}")
-    private String driverClassName;
-    @Value("${postgres.datasource.hikari.maximum-pool-size}")
-    private int maximumPoolSize;
-    @Value("${postgres.datasource.hikari.minimum-idle}")
-    private int minimumIdle;
-    @Value("${postgres.datasource.hikari.idle-timeout}")
-    private long idleTimeout;
-    @Value("${postgres.datasource.hikari.max-lifetime}")
-    private long maxLifetime;
-    @Value("${postgres.datasource.hikari.connection-timeout}")
-    private long connectionTimeout;
-    @Value("${postgres.datasource.hikari.data-source-properties.cachePrepStmts}")
-    private boolean cachePrepStmts;
-    @Value("${postgres.datasource.hikari.data-source-properties.prepStmtCacheSize}")
-    private int prepStmtCacheSize;
-    @Value("${postgres.datasource.hikari.data-source-properties.prepStmtCacheSqlLimit}")
-    private int prepStmtCacheSqlLimit;
-    @Value("${postgres.datasource.hikari.data-source-properties.useServerPrepStmts}")
-    private boolean useServerPrepStmts;
 
     @Bean(name = "postgresDataSource")
+    @ConfigurationProperties(prefix = "postgres.datasource")
     public DataSource postgresDataSource() {
-        HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(jdbcUrl);
-        hikariConfig.setUsername(username);
-        hikariConfig.setPassword(password);
-        hikariConfig.setDriverClassName(driverClassName);
-
-        hikariConfig.setMaximumPoolSize(maximumPoolSize);   //동시 유지할 수 있는 최대 커넥션 수
-        hikariConfig.setMinimumIdle(minimumIdle);   //유휴(idle) 상태로 유지할 최소 커넥션 수
-        hikariConfig.setIdleTimeout(idleTimeout);   //유휴 커넥션이 풀에서 제거 되기까지의 시간
-        hikariConfig.setMaxLifetime(maxLifetime);   //커넥션의 최대 수명
-        hikariConfig.setConnectionTimeout(connectionTimeout); //새 커넥션을 얻기 위해 대기하는 최대 시간을 지정
-        hikariConfig.addDataSourceProperty("cachePrepStmts", cachePrepStmts);   //preparedStatement 캐시 여부
-        hikariConfig.addDataSourceProperty("prepStmtCacheSize", prepStmtCacheSize); //캐시할 preparedStatment의 수
-        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", prepStmtCacheSqlLimit); //캐시할 SQL 문의 최대 길이를 지정합니다.
-        hikariConfig.addDataSourceProperty("useServerPrepStmts", useServerPrepStmts); // 서버 사이드 PreparedStatement 사용 여부를 결정 true로 하면, PreparedStatement가 데이터베이스 서버에서 처리되어 더 효율적인 쿼리 실행이 가능
-
-        return new HikariDataSource(hikariConfig);
+        return DataSourceBuilder.create().build();
     }
-
-
-//    @Bean(name = "postgresDataSource")
-//    @ConfigurationProperties(prefix = "postgres.datasource")
-//    public DataSource postgresDataSource() {
-//        return DataSourceBuilder.create().build();
-//    }
 }

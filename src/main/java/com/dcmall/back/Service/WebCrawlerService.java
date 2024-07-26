@@ -90,7 +90,7 @@ public class WebCrawlerService {
 
 
 
-            //inputDB("1", listTitle, listCost, listUrl);
+            inputDB("1", listTitle, listCost, listUrl);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -324,7 +324,7 @@ public class WebCrawlerService {
                     String post = row.get(i).select("a.title.hybrid-title").attr("href");
                     String[] postSplit = post.split("/");
                     String[] realPost = postSplit[postSplit.length-1].split("\\?");
-                    if(Integer.parseInt(realPost[0]) > postNumber){
+                    if(realPost[0].matches("\\d+") && Integer.parseInt(realPost[0]) > postNumber){  //realPost[0]가 d(정수형 패턴)에 맞아야 Integer로 변환
                         try {
                             String title =  Objects.requireNonNull(row.get(i).select("a.title.hybrid-title").first()).ownText().trim();
                             String price = row.get(i).select("span.deal-price").text();
