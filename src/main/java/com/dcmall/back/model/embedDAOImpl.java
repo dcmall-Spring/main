@@ -41,10 +41,9 @@ public class embedDAOImpl implements embedDAO {
         }
     }
 
-    public boolean isExist(String title) {
+    public synchronized boolean isExist(String title) {
         try {
             String result = sqlSessionTemplate.selectOne("isExist", title);
-            sqlSessionTemplate.clearCache();
             return result == null;
         } catch (Exception e) {
             e.printStackTrace();
