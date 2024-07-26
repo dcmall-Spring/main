@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,6 +30,8 @@ public class WebCrawlerService {
     EmbeddingService embeddingService;
     @Autowired
     embedDAO eDao;
+    @Autowired
+    private DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
 
     class ruilwebCost {
         BigDecimal cost;
@@ -88,7 +91,7 @@ public class WebCrawlerService {
 
 
 
-            //inputDB("1", listTitle, listCost, listUrl);
+            inputDB("1", listTitle, listCost, listUrl);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -197,7 +200,6 @@ public class WebCrawlerService {
 
                     while(!checkCost){
                         ruilwebResult = getCost(titles.get(i).text(), (ruilwebResult.get(0).getIndex() == Integer.MAX_VALUE) ? titles.get(i).text().length() : ruilwebResult.get(0).getIndex() );
-                        //System.out.println("검사: "+ruilwebResult.get(0).getCost()+" // "+ruilwebResult.get(0).getSquare());
                         if (ruilwebResult.get(0).getCost().intValue() != -1) {
                             ruilwebCost ruil = ruilwebResult.get(0);
                             square = ruil.getSquare();
@@ -206,16 +208,18 @@ public class WebCrawlerService {
 
                             price = total.toString();
                             String AmericanPrice = NumberFormat.getInstance().format(total);
-
                             try{
                                 String[] normal = titles.get(i).text().split(price);
                                 String[] American = titles.get(i).text().split(AmericanPrice);
 
-                                if(American.length >= 2){
+                                if(American.length >= 1){
                                     if(realPrice(American) == 0 && price.length() >= 4){
-                                        //price = "0";
-                                        checkCost = true;
-                                        price = ("₩ "+price+" (KRW)");
+                                        if(!price.contains(".")){
+                                            checkCost = true;
+                                            price = ("₩ "+price+" (KRW)");
+                                        }else{
+                                            price = "0";
+                                        }
                                     }else if(realPrice(American) == 1){
                                         if(price.equals("0")){
                                             checkCost = true;
@@ -238,7 +242,7 @@ public class WebCrawlerService {
                                     } else if(realPrice(American) == -1){
                                         price = "0";
                                     }
-                                }else if(normal.length >= 2){
+                                }else if(normal.length >= 1){
                                     if(realPrice(normal) == 0){
                                         price = "0";
                                     }else if(realPrice(normal) == 1){
@@ -280,11 +284,13 @@ public class WebCrawlerService {
                         }
                     }
                     String costCutTitle = removeHead(titles.get(i).text());
-
-                    if(costCutTitle.contains(price)){
-                        costCutTitle = deleteCost(costCutTitle, price);
-                    }else if(costCutTitle.contains(NumberFormat.getInstance().format(total))){
-                        costCutTitle = deleteCost(costCutTitle, NumberFormat.getInstance().format(total));
+                    if(costCutTitle.contains(total.toString())){
+                        costCutTitle = deleteCost(costCutTitle, total.toString());
+                    } else {
+                        String formattedTotal = NumberFormat.getInstance().format(total);
+                        if (costCutTitle.contains(formattedTotal)) {
+                            costCutTitle = deleteCost(costCutTitle, formattedTotal);
+                        }
                     }
 
                     listCost.add(price);
@@ -321,9 +327,9 @@ public class WebCrawlerService {
                     String post = row.get(i).select("a.title.hybrid-title").attr("href");
                     String[] postSplit = post.split("/");
                     String[] realPost = postSplit[postSplit.length-1].split("\\?");
-                    if(Integer.parseInt(realPost[0]) > postNumber){
+                    if(realPost[0].matches("\\d+") && Integer.parseInt(realPost[0]) > postNumber){  //realPost[0]가 d(정수형 패턴)에 맞아야 Integer로 변환
                         try {
-                            String title =  Objects.requireNonNull(row.get(i).select("a.title.hybrid-title").first()).ownText().trim();
+                            String title = Objects.requireNonNull(row.get(i).select("a.title.hybrid-title").first()).ownText().trim();
                             String price = row.get(i).select("span.deal-price").text();
 
                             StringBuilder sb = new StringBuilder(price);
@@ -336,9 +342,12 @@ public class WebCrawlerService {
                                 sb.insert(sb.length(), " (USD)");
                             }
 
-                            listTitle.add(title);
+                            String costCuttedTitle = deleteCost(title, cleanPriceString(price));
+
+                            listTitle.add(costCuttedTitle);
                             listCost.add(sb.toString());
                             listUrl.add(realPost[0]);
+
                         } catch(Exception e) {
                             System.out.println("error : " + e);
                         }
@@ -349,9 +358,11 @@ public class WebCrawlerService {
                 }
             }
             inputDB("4", listTitle, listCost, listUrl);
+            System.out.println("아카라이브 크롤링 성공!");
         }catch(Exception e){
             e.printStackTrace();
             System.out.println("아카라이브 스크랩 오류: "+e.getMessage());
+            System.out.println("응?");
         }
     }
 
@@ -418,12 +429,39 @@ public class WebCrawlerService {
         return index;
     }
 
-    public int realPrice(String[] arr){
-        if(arr[arr.length-2].charAt(arr[arr.length-2].length()-1) == '₩' || (arr[arr.length-1].charAt(0) == '원')){    //원화 1
-            return 1;
-        }else if(arr[arr.length-2].charAt(arr[arr.length-2].length()-1) == '$' ||(arr[arr.length-1].charAt(0) == '달' && arr[arr.length-1].charAt(1) == '러')){ //달러 2
-            return 2;
-        }else if(isUnit(arr[arr.length-1].charAt(0))) return -1;
+    public int realPrice(String[] arr) {
+        if (arr == null || arr.length == 0) {
+            return -1; // 또는 적절한 기본값
+        }
+
+        if (arr.length >= 2) {
+            String secondLast = arr[arr.length - 2];
+            String last = arr[arr.length - 1];
+
+            if (!secondLast.isEmpty() && secondLast.charAt(secondLast.length() - 1) == '₩' ||
+                    (!last.isEmpty() && last.charAt(0) == '원')) {
+                return 1; // 원화
+            } else if (!secondLast.isEmpty() && secondLast.charAt(secondLast.length() - 1) == '$' ||
+                    (last.length() >= 2 && last.charAt(0) == '달' && last.charAt(1) == '러')) {
+                return 2; // 달러
+            }
+        }
+
+        if (arr.length >= 1) {
+            String last = arr[arr.length - 1];
+            if (!last.isEmpty()) {
+                if (last.charAt(last.length() - 1) == '$') return 2;
+                if (last.charAt(last.length() - 1) == '₩') return 1;
+                if (isUnit(last.charAt(0))) return -1;
+            }
+        }
+
+        // 소수점이 있는 숫자이면서 단위가 없는 경우를 체크
+        for (String s : arr) {
+            if (s.matches("\\d+\\.\\d+")) {
+                return -1; // 소수점이 있는 숫자이면서 단위가 없으면 price로 인정하지 않음
+            }
+        }
 
         return 0;
     }
@@ -450,7 +488,7 @@ public class WebCrawlerService {
     private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
         for (int i = 0; i < listTitle.size(); i++) {
             String sTitle = listTitle.get(i);
-            if (eDao.isExist(sTitle) == null) {
+            if (eDao.isExist(sTitle)) {
                 var result = embeddingService.getEmbedding(sTitle);
 
                 eDao.insertEmbed(listTitle.get(i), result);
@@ -555,5 +593,8 @@ public class WebCrawlerService {
             return title;
         }
     }
-
+    public String cleanPriceString(String price) {
+        // 숫자, 소수점, 쉼표만 남기고 모든 문자 제거
+        return price.replaceAll("[^0-9.,]", "");
+    }
 }
