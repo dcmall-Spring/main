@@ -91,7 +91,7 @@ public class WebCrawlerService {
 
 
 
-            //inputDB("1", listTitle, listCost, listUrl);
+            inputDB("1", listTitle, listCost, listUrl);
 
         } catch (IOException e) {
             e.printStackTrace();
