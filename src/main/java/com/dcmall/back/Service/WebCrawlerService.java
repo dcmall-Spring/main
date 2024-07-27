@@ -486,8 +486,8 @@ public class WebCrawlerService {
                 (ch == '%');
     }
 
-    private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
-        for (int i = 0; i < listTitle.size(); i++) {
+    private synchronized void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
+        for (int i = 0; i < listTitle.size(); i++) {    //DB의 동시성 문제 해결을 위해 inputDB에 synchroized를 달아줬다.
             String sTitle = listTitle.get(i);
             if (eDao.isExist(sTitle)) {
                 var result = embeddingService.getEmbedding(sTitle);
