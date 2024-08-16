@@ -89,8 +89,6 @@ public class WebCrawlerService {
                 }
             }
 
-
-
             inputDB("1", listTitle, listCost, listUrl);
 
         } catch (IOException e) {
