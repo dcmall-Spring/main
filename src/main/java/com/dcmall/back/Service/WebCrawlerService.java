@@ -83,8 +83,9 @@ public class WebCrawlerService {
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String title = titles.get(i).text().replaceFirst("^\\[.*?\\]\\s*", "");
                     System.out.println("title : " + title);
-                    System.out.println("");
                     String titleQuasa = deleteCost(title, cost);
+                    System.out.println("error check " + titleQuasa);
+                    System.out.println("");
                     listTitle.add(titleQuasa);
                     listUrl.add(urls.get(i + 3).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
@@ -93,7 +94,7 @@ public class WebCrawlerService {
 
 
 
-            inputDB("1", listTitle, listCost, listUrl);
+            //inputDB("1", listTitle, listCost, listUrl);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -502,6 +503,7 @@ public class WebCrawlerService {
     }
 
     public String deleteCost(String title, String cost) {
+
         if(!title.contains("(") && !title.contains("[")){
             return title;
         }
@@ -522,14 +524,16 @@ public class WebCrawlerService {
         int end = 0;
 
         String endwith =  title.substring(title.length() - 3);
+        System.out.println("endwith : " + endwith);
         for(int i = 1 ; i < title.length() ; i++){
             if(title.charAt(i) == '[' || title.charAt(i) == '('){
                 start = i;
-            } else if (title.charAt(i) == ']' || title.charAt(i) == ')' || endwith.equals("...") && start != -1) {
+            } else if ((title.charAt(i) == ']' || title.charAt(i) == ')' || endwith.equals("...")) && start != -1) {
                 String costEqual;
                 if(title.contains("...")){
                     int count = title.indexOf("...");
                     costEqual = title.substring(start + 1, count).trim();
+                    end = count;
                 } else {
                     costEqual = title.substring(start + 1, i).trim();
                     end = i + 1;
@@ -557,7 +561,9 @@ public class WebCrawlerService {
                 }
                 if(costCheck == formattedNumber.length() || costCheck == deleteCommas.length()){
                     String firstTitle = title.substring(0, start);
-                    firstTitle += title.substring(end, title.length());
+                    if(!title.contains("...")){
+                        firstTitle += title.substring(end, title.length());
+                    }
                     title = firstTitle;
                 }
                 start = -1;
