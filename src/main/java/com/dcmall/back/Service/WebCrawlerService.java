@@ -5,6 +5,7 @@ import com.dcmall.back.model.embedDAO;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -81,8 +83,9 @@ public class WebCrawlerService {
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String title = titles.get(i).text().replaceFirst("^\\[.*?\\]\\s*", "");
                     System.out.println("title : " + title);
-                    System.out.println("");
                     String titleQuasa = deleteCost(title, cost);
+                    System.out.println("error check " + titleQuasa);
+                    System.out.println("");
                     listTitle.add(titleQuasa);
                     listUrl.add(urls.get(i + 3).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
@@ -484,8 +487,8 @@ public class WebCrawlerService {
                 (ch == '%');
     }
 
-    private synchronized void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
-        for (int i = 0; i < listTitle.size(); i++) {    //DB의 동시성 문제 해결을 위해 inputDB에 synchroized를 달아줬다.
+    private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
+        for (int i = 0; i < listTitle.size(); i++) {
             String sTitle = listTitle.get(i);
             if (eDao.isExist(sTitle)) {
                 var result = embeddingService.getEmbedding(sTitle);
@@ -498,6 +501,7 @@ public class WebCrawlerService {
     }
 
     public String deleteCost(String title, String cost) {
+
         if(!title.contains("(") && !title.contains("[")){
             return title;
         }
@@ -518,14 +522,16 @@ public class WebCrawlerService {
         int end = 0;
 
         String endwith =  title.substring(title.length() - 3);
+        System.out.println("endwith : " + endwith);
         for(int i = 1 ; i < title.length() ; i++){
             if(title.charAt(i) == '[' || title.charAt(i) == '('){
                 start = i;
-            } else if (title.charAt(i) == ']' || title.charAt(i) == ')' || endwith.equals("...") && start != -1) {
+            } else if ((title.charAt(i) == ']' || title.charAt(i) == ')' || endwith.equals("...")) && start != -1) {
                 String costEqual;
                 if(title.contains("...")){
                     int count = title.indexOf("...");
                     costEqual = title.substring(start + 1, count).trim();
+                    end = count;
                 } else {
                     costEqual = title.substring(start + 1, i).trim();
                     end = i + 1;
@@ -553,7 +559,9 @@ public class WebCrawlerService {
                 }
                 if(costCheck == formattedNumber.length() || costCheck == deleteCommas.length()){
                     String firstTitle = title.substring(0, start);
-                    firstTitle += title.substring(end, title.length());
+                    if(!title.contains("...")){
+                        firstTitle += title.substring(end, title.length());
+                    }
                     title = firstTitle;
                 }
                 start = -1;
