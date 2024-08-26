@@ -8,10 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.CompletableFuture;
 
-/*
-<a href="/bbs/qb_saleinfo/views/1609772" class="subject-link " style="display: block;">
-퀘이사 존은 최신 순으로 나열했을 때, views 뒤에 숫자가 커지는 경향이 있으니 저장해뒀다가 미만은 안 받아오게 막자
-*/
+/**
+ * 수동으로 크롤링으로 실행하는 WebController
+ */
 @RestController
 public class WebController {
     @Autowired

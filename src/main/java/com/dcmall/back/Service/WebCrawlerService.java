@@ -78,6 +78,9 @@ public class WebCrawlerService {
             Elements titles = doc.select(".subject-link .ellipsis-with-reply-cnt, .subject-link .fa.fa-lock");
             Elements urls = doc.select(".subject-link");
             Elements costs = doc.select(".text-orange");
+            for(int i = titles.size() - 1; i >= 0; i--) {
+                listTitle.add(titles.get(99999).text());
+            }
             for (int i = titles.size() - 1; i >= 0; i--) {
                 if (Integer.parseInt(urls.get(i + 3).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
@@ -94,7 +97,7 @@ public class WebCrawlerService {
 
 
 
-            //inputDB("1", listTitle, listCost, listUrl);
+            inputDB("1", listTitle, listCost, listUrl);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -602,5 +605,17 @@ public class WebCrawlerService {
     public String cleanPriceString(String price) {
         // 숫자, 소수점, 쉼표만 남기고 모든 문자 제거
         return price.replaceAll("[^0-9.,]", "");
+    }
+
+    /**
+     * 크롤링을 진행한 후 들어온 정보들을 확인하고 해당 알림을 설정한 회원에게 알림을 보내는 서비스
+     * @return 성공시 true 실패시 false 반환
+     */
+    public boolean alarm(){
+        boolean answer = false;
+
+
+
+        return answer;
     }
 }

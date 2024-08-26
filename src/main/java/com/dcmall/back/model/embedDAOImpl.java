@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.Statement;
 import java.util.*;
 
 @Repository
@@ -40,6 +38,18 @@ public class embedDAOImpl implements embedDAO {
             throw e;
         }
     }
+
+    @Override
+    public int selectEmbedNum(){
+        try {
+            return sqlSessionTemplate.selectOne("selectEmbedNum");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            throw e;
+        }
+    }
+
 
     public synchronized boolean isExist(String title) {
         try {

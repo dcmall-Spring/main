@@ -8,11 +8,9 @@ import java.util.ArrayList;
 
 @Data
 public class embedDTO {
-    @Getter
-    @Setter
+
+    private int num;
     private String title;
-    @Getter
-    @Setter
     private ArrayList<Double> embedding;
 
 }

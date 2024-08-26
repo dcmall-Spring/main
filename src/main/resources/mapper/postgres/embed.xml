@@ -13,4 +13,7 @@
     <select id="isExist" resultType="String">
         SELECT title FROM public.embedTable WHERE title = #{title};
     </select>
+    <select id="selectLastNum" resultType="int">
+        SELECT * FROM public.embedTable ORDER BY num DESC LIMIT 1;
+    </select>
 </mapper>
