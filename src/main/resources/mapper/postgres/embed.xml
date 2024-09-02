@@ -4,8 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dcmall.back.model.embedDAO">
     <insert id="insertEmbed" parameterType="map">
-        INSERT INTO public.embedTable (title, embedding)
-        VALUES (#{title}, #{embedding})
+        INSERT INTO public.embedTable (title, embedding, url, siteNum)
+        VALUES (#{title}, #{embedding}, #{url}, #{siteNum})
     </insert>
     <select id="selectEmbed" resultType="embedDTO">
         SELECT * FROM public.embedTable;

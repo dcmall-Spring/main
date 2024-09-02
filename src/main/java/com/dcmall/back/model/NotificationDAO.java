@@ -6,5 +6,5 @@ import java.util.List;
 
 
 public interface NotificationDAO {
-    List<Integer> notifications(int num);
+    List<SelectNotificationDTO> notifications(int num);
 }

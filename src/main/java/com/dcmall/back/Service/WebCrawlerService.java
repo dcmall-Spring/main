@@ -78,17 +78,11 @@ public class WebCrawlerService {
             Elements titles = doc.select(".subject-link .ellipsis-with-reply-cnt, .subject-link .fa.fa-lock");
             Elements urls = doc.select(".subject-link");
             Elements costs = doc.select(".text-orange");
-            for(int i = titles.size() - 1; i >= 0; i--) {
-                listTitle.add(titles.get(99999).text());
-            }
             for (int i = titles.size() - 1; i >= 0; i--) {
                 if (Integer.parseInt(urls.get(i + 3).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String title = titles.get(i).text().replaceFirst("^\\[.*?\\]\\s*", "");
-                    System.out.println("title : " + title);
                     String titleQuasa = deleteCost(title, cost);
-                    System.out.println("error check " + titleQuasa);
-                    System.out.println("");
                     listTitle.add(titleQuasa);
                     listUrl.add(urls.get(i + 3).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
@@ -125,7 +119,6 @@ public class WebCrawlerService {
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59")
                     .execute();
 
-            System.out.println(response);
 
             Document doc = Jsoup.connect(url).get();
 
@@ -494,10 +487,11 @@ public class WebCrawlerService {
     private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
         for (int i = 0; i < listTitle.size(); i++) {
             String sTitle = listTitle.get(i);
+            int iUrl = Integer.parseInt(listUrl.get(i));
             if (eDao.isExist(sTitle)) {
                 var result = embeddingService.getEmbedding(sTitle);
 
-                eDao.insertEmbed(listTitle.get(i), result);
+                eDao.insertEmbed(listTitle.get(i), result, iUrl, Integer.parseInt(siteNumber));
             }
 
             dao.insertProduct(siteNumber, listTitle.get(i), listCost.get(i), listUrl.get(i));
@@ -526,7 +520,6 @@ public class WebCrawlerService {
         int end = 0;
 
         String endwith =  title.substring(title.length() - 3);
-        System.out.println("endwith : " + endwith);
         for(int i = 1 ; i < title.length() ; i++){
             if(title.charAt(i) == '[' || title.charAt(i) == '('){
                 start = i;

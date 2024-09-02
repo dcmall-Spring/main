@@ -5,8 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
@@ -17,9 +18,11 @@ public class NotificationDAOImpl implements NotificationDAO {
     private SqlSessionTemplate sqlSessionTemplate;
 
     @Override
-    public List<Integer> notifications(int num){
+    public List<SelectNotificationDTO> notifications(int num){
         try {
-            return sqlSessionTemplate.selectList("selectNotification", num);
+            Map<String, Object> map = new HashMap<>();
+            map.put("num", num);
+            return sqlSessionTemplate.selectList("selectNotification", map);
         }catch (Exception e){
             e.printStackTrace();
             throw e;

@@ -14,11 +14,13 @@ public class embedDAOImpl implements embedDAO {
     private SqlSessionTemplate sqlSessionTemplate;
 
     @Override
-    public void insertEmbed(String title, ArrayList<Double> embedding) {
+    public void insertEmbed(String title, ArrayList<Double> embedding, int url, int siteNum) {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("title", title);
             params.put("embedding", embedding);
+            params.put("url", url);
+            params.put("siteNum", siteNum);
 
             sqlSessionTemplate.insert("insertEmbed", params);
         }catch (Exception e) {
@@ -40,9 +42,9 @@ public class embedDAOImpl implements embedDAO {
     }
 
     @Override
-    public int selectEmbedNum(){
+    public Object selectEmbedNum(){
         try {
-            return sqlSessionTemplate.selectOne("selectEmbedNum");
+            return sqlSessionTemplate.selectOne("selectLastNum");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());

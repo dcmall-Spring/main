@@ -1,5 +1,6 @@
 package com.dcmall.back.model;
 
+
 import lombok.Data;
 
 @Data

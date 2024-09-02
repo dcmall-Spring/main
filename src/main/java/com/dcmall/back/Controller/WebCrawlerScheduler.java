@@ -20,7 +20,17 @@ public class WebCrawlerScheduler {
 
     @Scheduled(fixedRate = 600000) // 10분(600,000밀리초)마다 실행
     public void scheduleCrawling() {
-        int num = embedDAO.selectEmbedNum();
+        Object result = embedDAO.selectEmbedNum();
+        int num;
+        if (result == null) {
+            num = 0;
+            System.out.println("null");
+        }
+        else if (result instanceof Integer) {
+            num = (Integer) result;
+        } else {
+            num = 0;
+        }
         try {
             CompletableFuture.runAsync(() -> {
                 try {
