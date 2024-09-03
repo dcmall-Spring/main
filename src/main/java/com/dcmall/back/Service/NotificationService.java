@@ -3,6 +3,7 @@ package com.dcmall.back.Service;
 import com.dcmall.back.model.NotificationDAO;
 import com.dcmall.back.model.SelectNotificationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,8 @@ public class NotificationService {
 
     @Autowired
     private NotificationDAO notificationDAO;
+
+
 
     public void titleCompare(int num){
 
@@ -26,13 +29,9 @@ public class NotificationService {
             sendmessage(notification.getUserNum(), notification.getTitle(), notification.getUrl(), notification.getSiteNum());
         }
 
-
-
     }
 
     public void sendmessage(int userNum, String title, int url, int siteNum){
 
-
-        
     }
 }

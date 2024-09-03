@@ -1,5 +1,6 @@
 package com.dcmall.back.Controller;
 
+import com.dcmall.back.Service.DiscordService;
 import com.dcmall.back.Service.WebCrawlerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,8 @@ import java.util.concurrent.CompletableFuture;
 public class WebController {
     @Autowired
     public WebCrawlerService webCrawlerService;
+    @Autowired
+    public DiscordService discordService;
 
     @GetMapping("/scrape")
     public String scrape() {
@@ -53,5 +56,9 @@ public class WebController {
         } catch (Exception e) {
             return "Scheduled crawling error: " + e.getMessage();
         }
+    }
+
+    @GetMapping("/discord")
+    public void Discord(){
     }
 }

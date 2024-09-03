@@ -39,7 +39,7 @@ dependencies {
 	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
 	implementation 'org.postgresql:postgresql:42.7.1'
-
+	implementation("net.dv8tion:JDA:5.1.0")	// JDA 최신버전
 }
 
 tasks.named('test') {
