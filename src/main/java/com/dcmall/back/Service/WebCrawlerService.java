@@ -2,22 +2,27 @@ package com.dcmall.back.Service;
 
 import com.dcmall.back.model.ProductInfoDAO;
 import com.dcmall.back.model.embedDAO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpMethod;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -30,8 +35,13 @@ public class WebCrawlerService {
     EmbeddingService embeddingService;
     @Autowired
     embedDAO eDao;
-    @Autowired
-    private DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
+    @Value("${kakao.api.key}")
+    private String kakaoKey;
+
+    /*RestTemplate은 Spring Framework에서 제공하는 HTTP 클라이언트로, RESTful 웹 서비스와 상호 작용할 때 사용하는 도구
+    주로 외부 API를 호출하거나 다른 서버와 통신할 때 사용되며, 다양한 HTTP 메서드(GET, POST, PUT, DELETE 등)를 지원합니다.
+     */
+    private final RestTemplate restTemplate = new RestTemplate();
 
     class ruilwebCost {
         BigDecimal cost;
@@ -82,10 +92,7 @@ public class WebCrawlerService {
                 if (Integer.parseInt(urls.get(i + 3).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String title = titles.get(i).text().replaceFirst("^\\[.*?\\]\\s*", "");
-                    System.out.println("title : " + title);
                     String titleQuasa = deleteCost(title, cost);
-                    System.out.println("error check " + titleQuasa);
-                    System.out.println("");
                     listTitle.add(titleQuasa);
                     listUrl.add(urls.get(i + 3).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
@@ -97,7 +104,6 @@ public class WebCrawlerService {
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
-            System.out.println(e);
         }
     }
 
@@ -356,7 +362,6 @@ public class WebCrawlerService {
                     }
                 }catch (Exception e){
                     e.printStackTrace();
-                    System.out.println("안되네~: "+e.getMessage());
                 }
             }
             inputDB("4", listTitle, listCost, listUrl);
@@ -364,7 +369,6 @@ public class WebCrawlerService {
         }catch(Exception e){
             e.printStackTrace();
             System.out.println("아카라이브 스크랩 오류: "+e.getMessage());
-            System.out.println("응?");
         }
     }
 
@@ -522,7 +526,6 @@ public class WebCrawlerService {
         int end = 0;
 
         String endwith =  title.substring(title.length() - 3);
-        System.out.println("endwith : " + endwith);
         for(int i = 1 ; i < title.length() ; i++){
             if(title.charAt(i) == '[' || title.charAt(i) == '('){
                 start = i;
@@ -601,5 +604,31 @@ public class WebCrawlerService {
     public String cleanPriceString(String price) {
         // 숫자, 소수점, 쉼표만 남기고 모든 문자 제거
         return price.replaceAll("[^0-9.,]", "");
+    }
+
+    public String findImg(String title) throws Exception {
+        System.out.println("이미지를 찾을 타이틀: "+title);
+        String url = "https://dapi.kakao.com/v2/search/image?query=" + title;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + kakaoKey);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        //return getThumbnailUrl(response.getBody());
+        return response.getBody();
+    }
+    public String getThumbnailUrl(String result) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(result);
+
+        // documents 배열의 첫 번째 객체의 thumbnail_url 추출
+        JsonNode documentsNode = rootNode.path("documents");
+        if (documentsNode.isArray() && !documentsNode.isEmpty()) {
+            JsonNode firstDocument = documentsNode.get(0);
+            return firstDocument.path("thumbnail_url").asText();
+        }
+
+        return null;
     }
 }
