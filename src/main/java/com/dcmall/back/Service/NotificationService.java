@@ -1,5 +1,6 @@
 package com.dcmall.back.Service;
 
+import com.dcmall.back.model.MyNotificationDAO;
 import com.dcmall.back.model.NotificationDAO;
 import com.dcmall.back.model.SelectNotificationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,12 @@ public class NotificationService {
     @Autowired
     private NotificationDAO notificationDAO;
 
+    @Autowired
+    private MyNotificationDAO myNotificationDAO;
+
+    @Autowired
+    private DiscordService discordService;
+
 
 
     public void titleCompare(int num){
@@ -21,10 +28,10 @@ public class NotificationService {
         List<SelectNotificationDTO> sn = notificationDAO.notifications(num);
 
         for(SelectNotificationDTO notification : sn){
-            System.out.println(notification.getUserNum());
-            System.out.println(notification.getTitle());
-            System.out.println(notification.getUrl());
-            System.out.println(notification.getSiteNum());
+            System.out.println("userNum : " + notification.getUserNum());
+            System.out.println("title : " +notification.getTitle());
+            System.out.println("url : " +notification.getUrl());
+            System.out.println("sitenum: " +notification.getSiteNum());
 
             sendmessage(notification.getUserNum(), notification.getTitle(), notification.getUrl(), notification.getSiteNum());
         }
@@ -32,6 +39,13 @@ public class NotificationService {
     }
 
     public void sendmessage(int userNum, String title, int url, int siteNum){
-
+        String discordNum = myNotificationDAO.selectDiscord(userNum);
+        System.out.println(discordNum);
+        System.out.println(title);
+        System.out.println(url);
+        System.out.println(siteNum);
+        if(discordNum != null){
+            discordService.sendMessage(discordNum, title, url, siteNum);
+        }
     }
 }

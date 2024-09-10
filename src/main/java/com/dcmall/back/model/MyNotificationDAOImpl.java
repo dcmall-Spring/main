@@ -22,4 +22,13 @@ public class MyNotificationDAOImpl implements MyNotificationDAO {
         map.put("discordNum", discordNum);
         sqlSessionTemplate.insert("insertDiscord", map);
     }
+    @Override
+    public String selectDiscord(int userNum) {
+        try{
+            return sqlSessionTemplate.selectOne("selectDiscord", userNum);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

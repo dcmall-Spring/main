@@ -1,7 +1,9 @@
 package com.dcmall.back.Controller;
 
 import com.dcmall.back.Service.DiscordService;
+import com.dcmall.back.Service.NotificationService;
 import com.dcmall.back.Service.WebCrawlerService;
+import com.dcmall.back.model.embedDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -17,10 +19,23 @@ public class WebController {
     @Autowired
     public WebCrawlerService webCrawlerService;
     @Autowired
-    public DiscordService discordService;
+    private com.dcmall.back.model.embedDAO embedDAO;
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/scrape")
     public String scrape() {
+        Object result = embedDAO.selectEmbedNum();
+        int num;
+        if (result == null) {
+            num = 0;
+            System.out.println("null");
+        }
+        else if (result instanceof Integer) {
+            num = (Integer) result;
+        } else {
+            num = 0;
+        }
         try {
             CompletableFuture.runAsync(() -> {
                 try {
@@ -50,6 +65,14 @@ public class WebController {
                 } catch (Exception e) {
                     System.out.println("Arcalive crawling error: " + e.getMessage());
                 }
+            }).thenRun(() ->{
+                try{
+                    notificationService.titleCompare(450);
+                    System.out.println("num" + num);
+                    System.out.println("Send Message completed");
+                }catch (Exception e) {
+                    System.out.println("Send Message error: " + e.getMessage());
+                }
             }).join();
 
             return "All scheduled crawling completed successfully";
@@ -58,7 +81,5 @@ public class WebController {
         }
     }
 
-    @GetMapping("/discord")
-    public void Discord(){
-    }
+
 }

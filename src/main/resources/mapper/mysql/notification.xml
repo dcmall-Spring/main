@@ -6,4 +6,7 @@
     <insert id="insertDiscord" parameterType="hashmap">
         INSERT INTO dcmall.notification (user_num, discord_num) VALUES (#{userNum}, #{discordNum})
     </insert>
+    <select id="selectDiscord" parameterType="int" resultType="String">
+        SELECT discord_num FROM dcmall.notification WHERE user_num = #{userNum}
+    </select>
 </mapper>

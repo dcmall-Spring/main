@@ -2,22 +2,17 @@ package com.dcmall.back.Service;
 
 import com.dcmall.back.model.DiscordDAO;
 import com.dcmall.back.model.MyNotificationDAO;
-import net.dv8tion.jda.api.EmbedBuilder;
+
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 
 
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
@@ -32,6 +27,14 @@ public class DiscordService extends ListenerAdapter {
     @Autowired
     private MyNotificationDAO Mdao;
 
+    private final JDA jda;
+
+    @Autowired
+    public DiscordService(JDA jda) {
+        this.jda = jda;
+    }
+
+
     private final String AUTH_COMMAND = "!인증";
     private final String VERIFIED_ROLE_NAME = "멤버"; // 부여할 역할 이름
 
@@ -44,16 +47,24 @@ public class DiscordService extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getAuthor().isBot()) return;
-
-        String message = event.getMessage().getContentRaw();
-        if (message.startsWith(AUTH_COMMAND)) {
-            handleAuthRequest(event);
+        if (event.getAuthor().isBot()) {
+            return;
+        }
+        
+        if(event.getChannel().getIdLong() == SIGN_UP_CHANNEL_ID){
+            String message = event.getMessage().getContentRaw();
+            if (message.startsWith(AUTH_COMMAND)) {
+                handleAuthRequest(event);
+            } else {
+                event.getChannel().sendMessage("올바른 인증 명령어가 아닙니다").queue();
+                deleteAuthMessage(event);
+            }
         }
     }
 
     private void handleAuthRequest(MessageReceivedEvent event) {
         String[] parts = event.getMessage().getContentRaw().split("\\s+", 2);
+        deleteAuthMessage(event);
         if (parts.length != 2) {
             event.getChannel().sendMessage("올바른 형식: !인증 [인증코드]").queue();
             return;
@@ -84,13 +95,37 @@ public class DiscordService extends ListenerAdapter {
                     event.getChannel().sendMessage("인증된 사용자 역할을 찾을 수 없습니다.").queue();
                 }
             }
-            
 
         } else {
             // 인증 실패
             event.getChannel().sendMessage("인증에 실패했습니다. 올바른 인증 코드를 입력해주세요.").queue();
         }
     }
+    
+    public void deleteAuthMessage(MessageReceivedEvent event) {
+        Message message = event.getMessage();
+        message.delete().queue(
+            success -> System.out.println("메시지가 성공적으로 삭제되었습니다."),
+            error -> System.err.println("메시지 삭제 중 오류 발생: " + error.getMessage())
+        );
+    }
+
+    public void sendMessage(String discordId, String title, int url, int siteNum){
+        jda.retrieveUserById(discordId).queue(user -> {
+            if (user != null) {
+                user.openPrivateChannel().queue(privateChannel -> {
+                    String message = String.format("제목: %s\n링크: http://yourwebsite.com/item/%d\n사이트 번호: %d", title, url, siteNum);
+                    privateChannel.sendMessage(message).queue(
+                        success -> System.out.println("개인 메시지가 성공적으로 전송되었습니다."),
+                        error -> System.err.println("개인 메시지 전송 중 오류 발생: " + error.getMessage())
+                    );
+                });
+            } else {
+                System.err.println("사용자를 찾을 수 없습니다: " + discordId);
+            }
+        });
+    }
+
 }
 
 

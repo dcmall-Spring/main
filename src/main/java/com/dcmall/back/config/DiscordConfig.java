@@ -14,12 +14,18 @@ public class DiscordConfig {
     private String DiscordToken;
 
     @Bean
-    public JDA jda(DiscordService discordService) throws Exception {
+    public JDA jda() throws Exception {
         JDA jda = JDABuilder.createDefault(DiscordToken)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                .addEventListeners(discordService)
                 .build();
-        jda.awaitReady();  // JDA가 완전히 초기화될 때까지 대기
+        jda.awaitReady();
         return jda;
+    }
+
+    @Bean
+    public DiscordService discordService(JDA jda) {
+        DiscordService discordService = new DiscordService(jda);
+        jda.addEventListener(discordService);
+        return discordService;
     }
 }
