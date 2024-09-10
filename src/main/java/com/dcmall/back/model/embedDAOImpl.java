@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.Statement;
 import java.util.*;
 
 @Repository
@@ -19,11 +17,13 @@ public class embedDAOImpl implements embedDAO {
     private DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
 
     @Override
-    public void insertEmbed(String title, ArrayList<Double> embedding) {
+    public void insertEmbed(String title, ArrayList<Double> embedding, int url, int siteNum) {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("title", title);
             params.put("embedding", embedding);
+            params.put("url", url);
+            params.put("siteNum", siteNum);
 
             sqlSessionTemplate.insert("insertEmbed", params);
         }catch (Exception e) {
@@ -43,6 +43,18 @@ public class embedDAOImpl implements embedDAO {
             throw e;
         }
     }
+
+    @Override
+    public Object selectEmbedNum(){
+        try {
+            return sqlSessionTemplate.selectOne("selectLastNum");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            throw e;
+        }
+    }
+
 
     public synchronized boolean isExist(String title) {
         try {

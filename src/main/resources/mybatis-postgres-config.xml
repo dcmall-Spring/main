@@ -10,6 +10,8 @@
 
     <typeAliases>
         <typeAlias type="com.dcmall.back.model.embedDTO" alias="embedDTO"/>
+        <typeAlias type="com.dcmall.back.model.NotificationDTO" alias="NotificationDTO"/>
+        <typeAlias type="com.dcmall.back.model.SelectNotificationDTO" alias="SelectNotificationDTO"/>
     </typeAliases>
 
     <typeHandlers>
@@ -18,5 +20,6 @@
 
     <mappers>
         <mapper resource="mapper/postgres/embed.xml"/>
+        <mapper resource="mapper/postgres/notification.xml"/>
     </mappers>
 </configuration>

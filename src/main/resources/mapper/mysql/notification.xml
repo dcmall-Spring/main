@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dcmall.back.model.MyNotificationDTO">
+    <insert id="insertDiscord" parameterType="hashmap">
+        INSERT INTO dcmall.notification (user_num, discord_num) VALUES (#{userNum}, #{discordNum})
+    </insert>
+    <select id="selectDiscord" parameterType="int" resultType="String">
+        SELECT discord_num FROM dcmall.notification WHERE user_num = #{userNum}
+    </select>
+</mapper>

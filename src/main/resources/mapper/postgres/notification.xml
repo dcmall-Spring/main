@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dcmall.back.model.NotificationDAO">
+    <select id="selectNotification" parameterType="map" resultType="SelectNotificationDTO">
+        SELECT
+            n.num AS usernum,
+            n.title AS title,
+            e.url AS url,
+            e.sitenum AS sitenum
+        FROM embedtable e
+                 CROSS JOIN notification n
+        WHERE e.num > 3
+          AND (1 - (e.embedding <![CDATA[<=>]]> n.embedding)) >= n.threshold / 100.0
+        ORDER BY n.num
+    </select>
+</mapper>

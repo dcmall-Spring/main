@@ -9,11 +9,15 @@
         <typeAlias type="com.dcmall.back.model.UserDTO" alias="UserDTO"/>
         <typeAlias type="com.dcmall.back.model.ProductInfoDTO" alias="ProductInfoDTO"/>
         <typeAlias type="com.dcmall.back.model.SiteDTO" alias="SiteDTO"/>
+        <typeAlias type="com.dcmall.back.model.DiscordDTO" alias="DiscordDTO"/>
+        <typeAlias type="com.dcmall.back.model.MyNotificationDTO" alias="MyNotificationDTO"/>
     </typeAliases>
 
     <mappers>
         <mapper resource="mapper/mysql/productinfo.xml"/>
         <mapper resource="mapper/mysql/site.xml"/>
         <mapper resource="mapper/mysql/user.xml"/>
+        <mapper resource="mapper/mysql/discord.xml"/>
+        <mapper resource="mapper/mysql/notification.xml"/>
     </mappers>
 </configuration>
