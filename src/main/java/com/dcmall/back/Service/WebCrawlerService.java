@@ -494,10 +494,11 @@ public class WebCrawlerService {
     private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl) throws IOException {
         for (int i = 0; i < listTitle.size(); i++) {
             String sTitle = listTitle.get(i);
+            int iUrl = Integer.parseInt(listUrl.get(i));
             if (eDao.isExist(sTitle)) {
                 var result = embeddingService.getEmbedding(sTitle);
 
-                eDao.insertEmbed(listTitle.get(i), result);
+                eDao.insertEmbed(listTitle.get(i), result, iUrl, Integer.parseInt(siteNumber));
             }
 
             dao.insertProduct(siteNumber, listTitle.get(i), listCost.get(i), listUrl.get(i));
