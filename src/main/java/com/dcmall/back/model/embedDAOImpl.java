@@ -3,6 +3,7 @@ package com.dcmall.back.model;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -12,6 +13,8 @@ public class embedDAOImpl implements embedDAO {
     @Autowired
     @Qualifier("postgreSqlSessionTemplate")
     private SqlSessionTemplate sqlSessionTemplate;
+    @Autowired
+    private DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
 
     @Override
     public void insertEmbed(String title, ArrayList<Double> embedding, int url, int siteNum) {
@@ -59,6 +62,7 @@ public class embedDAOImpl implements embedDAO {
             return result == null;
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Exist 에러: "+e.getMessage());
             return false;
         }
     }

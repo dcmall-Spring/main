@@ -2,22 +2,21 @@ package com.dcmall.back.Service;
 
 import com.dcmall.back.model.ProductInfoDAO;
 import com.dcmall.back.model.embedDAO;
+
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -31,7 +30,12 @@ public class WebCrawlerService {
     @Autowired
     embedDAO eDao;
     @Autowired
-    private DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
+    private GcsService gcsService;
+
+    /*RestTemplate은 Spring Framework에서 제공하는 HTTP 클라이언트로, RESTful 웹 서비스와 상호 작용할 때 사용하는 도구
+    주로 외부 API를 호출하거나 다른 서버와 통신할 때 사용되며, 다양한 HTTP 메서드(GET, POST, PUT, DELETE 등)를 지원합니다.
+     */
+    private final RestTemplate restTemplate = new RestTemplate();
 
     class ruilwebCost {
         BigDecimal cost;
@@ -57,10 +61,11 @@ public class WebCrawlerService {
         }
     }
 
-    public void scrapeQuasarzone(String url) {
+    public void scrapeQuasarzone(String url){
         ArrayList<String> listTitle = new ArrayList<>();
         ArrayList<String> listUrl = new ArrayList<>();
         ArrayList<String> listCost = new ArrayList<>();
+        ArrayList<String> listImgUrl = new ArrayList<>();
         String product = this.dao.selectProduct(1);
 
         int postNumber = 0;
@@ -78,8 +83,13 @@ public class WebCrawlerService {
             Elements titles = doc.select(".subject-link .ellipsis-with-reply-cnt, .subject-link .fa.fa-lock");
             Elements urls = doc.select(".subject-link");
             Elements costs = doc.select(".text-orange");
+            Elements thumbs = doc.select(".thumb-wrap");
+
             for (int i = titles.size() - 1; i >= 0; i--) {
-                if (Integer.parseInt(urls.get(i + 3).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
+                // Check if the index is within bounds
+                if (i + 3 < urls.size() && Integer.parseInt(urls.get(i + 3).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
+                    listImgUrl.add(thumbs.get(i).select("img").attr("src"));    //뜯어냈음
+
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String title = titles.get(i).text().replaceFirst("^\\[.*?\\]\\s*", "");
                     String titleQuasa = deleteCost(title, cost);
@@ -88,10 +98,8 @@ public class WebCrawlerService {
                     listCost.add(costs.get(i).text());
                 }
             }
-
-
-
-            inputDB("1", listTitle, listCost, listUrl);
+            ArrayList<String> accessUrl = gcsService.uploadFile(listImgUrl, "QuasarZone");
+            inputDB("1", listTitle, listCost, listUrl, accessUrl);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,6 +127,7 @@ public class WebCrawlerService {
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59")
                     .execute();
 
+            System.out.println(response);
 
             Document doc = Jsoup.connect(url).get();
 
@@ -159,7 +168,7 @@ public class WebCrawlerService {
                     }
                 }
             }
-        System.out.println("aaa");
+            System.out.println("aaa");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -305,11 +314,67 @@ public class WebCrawlerService {
             System.out.println("루리웹 오류: " + e.getMessage());
         }
     }
-
+    //    public void scrapeArcalive(String url) throws IOException {
+//        ArrayList<String> listTitle = new ArrayList<>();
+//        ArrayList<String> listUrl = new ArrayList<>();
+//        ArrayList<String> listCost = new ArrayList<>();
+//        String product = this.dao.selectProduct(4);
+//
+//        int postNumber = 0;
+//
+//        if (product != null) {
+//            postNumber = Integer.parseInt(product);
+//        }
+//
+//        try{
+//            Document doc = Jsoup.connect(url).get();
+//            Elements row = doc.select("div.vrow-inner:not(:has(div.vrow-top.deal.deal-close))");
+//            for(int i = row.size()-1 ; i >= 0 ; i--){
+//                try{
+//                    String post = row.get(i).select("a.title.hybrid-title").attr("href");
+//                    String[] postSplit = post.split("/");
+//                    String[] realPost = postSplit[postSplit.length-1].split("\\?");
+//                    if(realPost[0].matches("\\d+") && Integer.parseInt(realPost[0]) > postNumber){  //realPost[0]가 d(정수형 패턴)에 맞아야 Integer로 변환
+//                        try {
+//                            String title = Objects.requireNonNull(row.get(i).select("a.title.hybrid-title").first()).ownText().trim();
+//                            String price = row.get(i).select("span.deal-price").text();
+//
+//                            StringBuilder sb = new StringBuilder(price);
+//                            if(price.contains("원")){
+//                                sb.setLength(sb.length() - 1);
+//                                sb.insert(0,"₩ ");
+//                                sb.insert(sb.length(), " (KRW)");
+//                            }else if(price.contains("$")){
+//                                sb.insert(0,"$ ");
+//                                sb.insert(sb.length(), " (USD)");
+//                            }
+//
+//                            String costCuttedTitle = deleteCost(title, cleanPriceString(price));
+//
+//                            listTitle.add(costCuttedTitle);
+//                            listCost.add(sb.toString());
+//                            listUrl.add(realPost[0]);
+//
+//                        } catch(Exception e) {
+//                            System.out.println("error : " + e);
+//                        }
+//                    }
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//            }
+//            //inputDB("4", listTitle, listCost, listUrl);
+//            System.out.println("아카라이브 크롤링 성공!");
+//        }catch(Exception e){
+//            e.printStackTrace();
+//            System.out.println("아카라이브 스크랩 오류: "+e.getMessage());
+//        }
+//    }
     public void scrapeArcalive(String url) throws IOException {
         ArrayList<String> listTitle = new ArrayList<>();
         ArrayList<String> listUrl = new ArrayList<>();
         ArrayList<String> listCost = new ArrayList<>();
+        ArrayList<String> listImgUrl = new ArrayList<>();
         String product = this.dao.selectProduct(4);
 
         int postNumber = 0;
@@ -320,12 +385,22 @@ public class WebCrawlerService {
 
         try{
             Document doc = Jsoup.connect(url).get();
-            Elements row = doc.select("div.vrow-inner:not(:has(div.vrow-top.deal.deal-close))");
+            Elements row = doc.select("div.vrow-inner");
+            Elements thumbs = doc.select("div.vrow-preview");
             for(int i = row.size()-1 ; i >= 0 ; i--){
                 try{
+                    if(row.hasAttr("div.vrow-top.deal.deal-close")) continue;
+
                     String post = row.get(i).select("a.title.hybrid-title").attr("href");
                     String[] postSplit = post.split("/");
                     String[] realPost = postSplit[postSplit.length-1].split("\\?");
+                    if (i < thumbs.size()) {
+                        String smallThumburl = thumbs.get(i).select("img").attr("src");
+                        String[] remakeUrl = smallThumburl.split("&type");
+                        smallThumburl = "https:"+remakeUrl[0];
+
+                        listImgUrl.add(smallThumburl);
+                    }
                     if(realPost[0].matches("\\d+") && Integer.parseInt(realPost[0]) > postNumber){  //realPost[0]가 d(정수형 패턴)에 맞아야 Integer로 변환
                         try {
                             String title = Objects.requireNonNull(row.get(i).select("a.title.hybrid-title").first()).ownText().trim();
@@ -353,15 +428,15 @@ public class WebCrawlerService {
                     }
                 }catch (Exception e){
                     e.printStackTrace();
-                    System.out.println("안되네~: "+e.getMessage());
                 }
             }
-            inputDB("4", listTitle, listCost, listUrl);
+            ArrayList<String> accessUrl = gcsService.uploadFile(listImgUrl, "Arcalive");
+
+            inputDB("4", listTitle, listCost, listUrl, accessUrl);
             System.out.println("아카라이브 크롤링 성공!");
         }catch(Exception e){
             e.printStackTrace();
             System.out.println("아카라이브 스크랩 오류: "+e.getMessage());
-            System.out.println("응?");
         }
     }
 
@@ -498,6 +573,20 @@ public class WebCrawlerService {
         }
     }
 
+    private void inputDB(String siteNumber, ArrayList<String> listTitle, ArrayList<String> listCost, ArrayList<String> listUrl, ArrayList<String> imageUrl) throws IOException {
+        for (int i = 0; i < listTitle.size(); i++) {
+            String sTitle = listTitle.get(i);
+            int iUrl = Integer.parseInt(listUrl.get(i));
+            if (eDao.isExist(sTitle)) {
+                var result = embeddingService.getEmbedding(sTitle);
+
+                eDao.insertEmbed(listTitle.get(i), result, iUrl, Integer.parseInt(siteNumber));
+            }
+
+            dao.insertProductWithImage(siteNumber, listTitle.get(i), listCost.get(i), listUrl.get(i), imageUrl.get(i));
+        }
+    }
+
     public String deleteCost(String title, String cost) {
 
         if(!title.contains("(") && !title.contains("[")){
@@ -598,17 +687,5 @@ public class WebCrawlerService {
     public String cleanPriceString(String price) {
         // 숫자, 소수점, 쉼표만 남기고 모든 문자 제거
         return price.replaceAll("[^0-9.,]", "");
-    }
-
-    /**
-     * 크롤링을 진행한 후 들어온 정보들을 확인하고 해당 알림을 설정한 회원에게 알림을 보내는 서비스
-     * @return 성공시 true 실패시 false 반환
-     */
-    public boolean alarm(){
-        boolean answer = false;
-
-
-
-        return answer;
     }
 }

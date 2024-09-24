@@ -25,6 +25,19 @@ public class ProductInfoDAOImpl implements ProductInfoDAO {
         return sqlSessionTemplate.insert("insertProduct", hashMap);
     }
 
+    @Override
+    public int insertProductWithImage(String id, String title, String cost, String url, String imageUrl){
+        HashMap<String, String> hashMap = new HashMap<>(){{
+            put("id", id);
+            put("title", title);
+            put("cost", cost);
+            put("url", url);
+            put("imageUrl", imageUrl);
+        }};
+
+        return sqlSessionTemplate.insert("insertProductWithImage", hashMap);
+    }
+
     /**
      * 퀘이사존 최상단 데이터를 가져오는 메서드.
      * @return

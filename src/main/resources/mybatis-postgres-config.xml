@@ -4,6 +4,10 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+    <settings>
+        <setting name="cacheEnabled" value="false"/>
+    </settings>
+
     <typeAliases>
         <typeAlias type="com.dcmall.back.model.embedDTO" alias="embedDTO"/>
         <typeAlias type="com.dcmall.back.model.NotificationDTO" alias="NotificationDTO"/>
