@@ -66,7 +66,7 @@ public class WebController {
                 }
             }).thenRun(() ->{
                 try{
-                    notificationService.titleCompare(450);
+                    notificationService.titleCompare(num);
                     System.out.println("num" + num);
                     System.out.println("Send Message completed");
                 }catch (Exception e) {

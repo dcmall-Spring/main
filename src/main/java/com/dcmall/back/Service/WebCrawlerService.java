@@ -124,19 +124,9 @@ public class WebCrawlerService {
             Elements titles = doc.select(".hotdeal_var8");
             Elements costs = doc.select(".hotdeal_info span:contains(가격)");
             Elements delTitle = doc.select(".hotdeal_var8Y[href]");
-            System.out.println("titles: " + titles.get(1).text());
-            System.out.println("Url: " + titles.get(1).text());
-            System.out.println("titles: " + titles.get(1).attr("href"));
-            System.out.println("delete: " + delTitle.get(0));
 
             Collections.reverse(titles);
             Collections.reverse(costs);
-            System.out.println("costs: " + delTitle.get(0));
-            System.out.println("aa");
-
-
-            System.out.println("titles number : " + titles.size());
-            System.out.println("costs number : " + costs.size());
 
             if(titles.size() == costs.size()) {
                 for (int i = 0; i < titles.size(); i++) {
@@ -148,7 +138,6 @@ public class WebCrawlerService {
                 }
             } else {
                 for (int i = 0; i < titles.size(); i++) {
-                    System.out.println(costs.get(i).selectFirst("a").attr("href")+ " " + titles.get(i).attr("href"));
                     if (Long.parseLong(titles.get(i).attr("href").substring(1)) > postNumber &&
                             costs.get(i).attr("href").equals(titles.get(i).attr("href"))) {
                         listTitle.add(titles.get(i).text());
@@ -157,7 +146,6 @@ public class WebCrawlerService {
                     }
                 }
             }
-        System.out.println("aaa");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -359,7 +347,6 @@ public class WebCrawlerService {
         }catch(Exception e){
             e.printStackTrace();
             System.out.println("아카라이브 스크랩 오류: "+e.getMessage());
-            System.out.println("응?");
         }
     }
 
