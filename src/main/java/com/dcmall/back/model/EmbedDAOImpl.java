@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public class embedDAOImpl implements embedDAO {
+public class EmbedDAOImpl implements EmbedDAO {
     @Autowired
     @Qualifier("postgreSqlSessionTemplate")
     private SqlSessionTemplate sqlSessionTemplate;
@@ -31,7 +31,7 @@ public class embedDAOImpl implements embedDAO {
     }
 
     @Override
-    public List<embedDTO> selectEmbed(){   //검색을 요청할 때마다 매번 불러오는 건 그런데..
+    public List<EmbedDTO> selectEmbed(){   //검색을 요청할 때마다 매번 불러오는 건 그런데..
         try{
             return sqlSessionTemplate.selectList("selectEmbed");
         }catch(Exception e){

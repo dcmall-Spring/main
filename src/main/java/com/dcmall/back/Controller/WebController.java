@@ -1,9 +1,8 @@
 package com.dcmall.back.Controller;
 
-import com.dcmall.back.Service.DiscordService;
 import com.dcmall.back.Service.NotificationService;
 import com.dcmall.back.Service.WebCrawlerService;
-import com.dcmall.back.model.embedDAO;
+import com.dcmall.back.model.EmbedDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -19,7 +18,7 @@ public class WebController {
     @Autowired
     public WebCrawlerService webCrawlerService;
     @Autowired
-    private com.dcmall.back.model.embedDAO embedDAO;
+    private EmbedDAO embedDAO;
     @Autowired
     private NotificationService notificationService;
 

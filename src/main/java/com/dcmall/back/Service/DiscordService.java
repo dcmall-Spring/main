@@ -114,7 +114,17 @@ public class DiscordService extends ListenerAdapter {
         jda.retrieveUserById(discordId).queue(user -> {
             if (user != null) {
                 user.openPrivateChannel().queue(privateChannel -> {
-                    String message = String.format("제목: %s\n링크: http://yourwebsite.com/item/%d\n사이트 번호: %d", title, url, siteNum);
+                    String webSite = "";
+                    if(siteNum == 1){
+                        webSite = "https://quasarzone.com/bbs/qb_saleinfo/views";
+                    } else if (siteNum == 2) {
+                        webSite = "https://www.fmkorea.com/hotdeal";
+                    } else if (siteNum == 3) {
+                        webSite = "https://m.ruliweb.com/market/board/1020";
+                    } else if (siteNum == 4) {
+                        webSite = "https://arca.live/b/hotdeal";
+                    }
+                    String message = String.format("제목: %s\n링크: %s/%s\n", title, webSite, url);
                     privateChannel.sendMessage(message).queue(
                         success -> System.out.println("개인 메시지가 성공적으로 전송되었습니다."),
                         error -> System.err.println("개인 메시지 전송 중 오류 발생: " + error.getMessage())
