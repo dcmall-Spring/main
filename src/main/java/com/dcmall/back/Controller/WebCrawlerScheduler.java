@@ -39,13 +39,13 @@ public class WebCrawlerScheduler {
                 } catch (Exception e) {
                     System.out.println("Quasarzone crawling error: " + e.getMessage());
                 }
-            /*}).thenRun(() -> {
+            }).thenRun(() -> {
                 try {
                     webCrawlerService.scrapefmkorea("https://www.fmkorea.com/hotdeal");
                     System.out.println("FMKorea crawling completed");
                 } catch (Exception e) {
                     System.out.println("FMKorea crawling error: " + e.getMessage());
-                }*/
+                }
             }).thenRun(() -> {
                 try {
                     webCrawlerService.scrapeRuliWeb("https://m.ruliweb.com/market/board/1020");
