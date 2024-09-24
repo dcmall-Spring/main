@@ -66,13 +66,13 @@ public class WebController {
                     System.out.println("Arcalive crawling error: " + e.getMessage());
                 }
             }).thenRun(() ->{
-                try{
-                    notificationService.titleCompare(450);
-                    System.out.println("num" + num);
-                    System.out.println("Send Message completed");
-                }catch (Exception e) {
-                    System.out.println("Send Message error: " + e.getMessage());
-                }
+//                try{
+//                    notificationService.titleCompare(450);
+//                    System.out.println("num" + num);
+//                    System.out.println("Send Message completed");
+//                }catch (Exception e) {
+//                    System.out.println("Send Message error: " + e.getMessage());
+//                }
             }).join();
 
             return "All scheduled crawling completed successfully";

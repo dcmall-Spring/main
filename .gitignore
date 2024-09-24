@@ -37,9 +37,5 @@ out/
 ### VS Code ###
 .vscode/
 
-<<<<<<< HEAD
-### DBinfo ###
-=======
-# Ignore application.properties file
->>>>>>> submain
 src/main/resources/application.properties
+src/main/resources/omega-baton-436312-g4-390956240911.json
