@@ -1,13 +1,11 @@
 package com.dcmall.back.model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 
 @Data
-public class embedDTO {
+public class EmbedDTO {
 
     private int num;
     private String title;

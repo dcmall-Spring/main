@@ -2,7 +2,7 @@ package com.dcmall.back.Controller;
 
 import com.dcmall.back.Service.NotificationService;
 import com.dcmall.back.Service.WebCrawlerService;
-import com.dcmall.back.model.embedDAO;
+import com.dcmall.back.model.EmbedDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ public class WebCrawlerScheduler {
     @Autowired
     private WebCrawlerService webCrawlerService;
     @Autowired
-    private embedDAO embedDAO;
+    private EmbedDAO embedDAO;
     @Autowired
     private NotificationService notificationService;
 

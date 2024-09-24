@@ -12,7 +12,9 @@
         FROM embedtable e
                  CROSS JOIN notification n
         WHERE e.num > 3
-          AND (1 - (e.embedding <![CDATA[<=>]]> n.embedding)) >= n.threshold / 100.0
+          AND (1 - (e.embedding <![CDATA[<=>]]> n.embedding)) >= n.threshold / 100.0 +
+        (case when i.title ilike '%'  query_text  '%' then 0.3 else 0 end) +  -- 키워드 매칭 (30% 가중치)
+        (case when i.title ilike query_text  '%' then 0.2 else 0 end) as similarity  -- 접두어 매칭 추가 가중치
         ORDER BY n.num
     </select>
 </mapper>
