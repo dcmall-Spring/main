@@ -11,5 +11,4 @@ public class ProductInfoDTO {
     private String reply;
     private int like;
     private String url;
-    private String imageUrl;
 }
