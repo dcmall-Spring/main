@@ -1,7 +1,7 @@
 package com.dcmall.back.Service;
 
+import com.dcmall.back.model.EmbedDAO;
 import com.dcmall.back.model.ProductInfoDAO;
-import com.dcmall.back.model.embedDAO;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -28,7 +28,7 @@ public class WebCrawlerService {
     @Autowired
     EmbeddingService embeddingService;
     @Autowired
-    embedDAO eDao;
+    EmbedDAO eDao;
     @Autowired
     private GcsService gcsService;
 
@@ -87,14 +87,13 @@ public class WebCrawlerService {
 
             for (int i = titles.size() - 1; i >= 0; i--) {
                 // Check if the index is within bounds
-                if (i + 3 < urls.size() && Integer.parseInt(urls.get(i + 3).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
-                    listImgUrl.add(thumbs.get(i).select("img").attr("src"));    //뜯어냈음
-
+                if (Integer.parseInt(urls.get(i + 2).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
+                    listImgUrl.add(thumbs.get(i).select("img").attr("src"));
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String title = titles.get(i).text().replaceFirst("^\\[.*?\\]\\s*", "");
                     String titleQuasa = deleteCost(title, cost);
                     listTitle.add(titleQuasa);
-                    listUrl.add(urls.get(i + 3).attr("href").substring(23));
+                    listUrl.add(urls.get(i + 2).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
                 }
             }

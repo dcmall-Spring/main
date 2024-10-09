@@ -120,7 +120,7 @@ public class DiscordService extends ListenerAdapter {
                     } else if (siteNum == 2) {
                         webSite = "https://www.fmkorea.com/hotdeal";
                     } else if (siteNum == 3) {
-                        webSite = "https://m.ruliweb.com/market/board/1020";
+                        webSite = "https://m.ruliweb.com/market/board/1020/read";
                     } else if (siteNum == 4) {
                         webSite = "https://arca.live/b/hotdeal";
                     }

@@ -44,6 +44,10 @@ MyBatis는 데이터 소스를 통해 데이터베이스와 연결하고 SQL 쿼
     생성된 SqlSessionFactory는 MyBatis가 SQL 세션을 생성하고 데이터베이스와 상호작용하는 데 사용됩니다.
     DataSourceTransactionManager와 SqlSessionTemplate도 설정하여 트랜잭션 관리 및 SQL 세션 관리를 지원합니다.
 
+기본 DataSource는 기본적으로 HikariCP의 기본 설정을 따라간다.
+hikariConfig로 설정을 좀 더 구체적으로 해준 것에 불과 PreparedStatement 문제 해결에 직접적인 영향은 줄 수 없다.
+설정을 안 해도 그만이지만, 조금 더 나은 환경을 위해 설정 해준 것.
+나중에 불필요하면 날리자...
  */
 @Configuration
 public class PostgresDataSourceConfig {

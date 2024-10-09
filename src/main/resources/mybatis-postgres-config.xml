@@ -6,6 +6,7 @@
 <configuration>
     <settings>
         <setting name="cacheEnabled" value="false"/>
+        <setting name="defaultExecutorType" value="REUSE"/>
     </settings>
 
     <typeAliases>
