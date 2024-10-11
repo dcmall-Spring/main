@@ -81,19 +81,19 @@ public class WebCrawlerService {
              */
             // subject-link 클래스를 가진 요소 선택
             Elements titles = doc.select(".subject-link .ellipsis-with-reply-cnt, .subject-link .fa.fa-lock");
-            Elements urls = doc.select(".subject-link");
+            Elements urls = doc.select(".subject-link:not(.all-notice-wrap .subject-link)");
             Elements costs = doc.select(".text-orange");
             Elements thumbs = doc.select(".thumb-wrap");
 
             for (int i = titles.size() - 1; i >= 0; i--) {
                 // Check if the index is within bounds
-                if (Integer.parseInt(urls.get(i + 2).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
+                if (Integer.parseInt(urls.get(i).attr("href").substring(23)) > postNumber && !titles.get(i).hasClass("fa fa-lock")) {
                     listImgUrl.add(thumbs.get(i).select("img").attr("src"));
                     String cost = costs.get(i).text().substring(1).split("\\(")[0].trim();
                     String title = titles.get(i).text().replaceFirst("^\\[.*?\\]\\s*", "");
                     String titleQuasa = deleteCost(title, cost);
                     listTitle.add(titleQuasa);
-                    listUrl.add(urls.get(i + 2).attr("href").substring(23));
+                    listUrl.add(urls.get(i).attr("href").substring(23));
                     listCost.add(costs.get(i).text());
                 }
             }
