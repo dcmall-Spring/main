@@ -4,8 +4,15 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+    <settings>
+        <setting name="cacheEnabled" value="false"/>
+        <setting name="defaultExecutorType" value="REUSE"/>
+    </settings>
+
     <typeAliases>
-        <typeAlias type="com.dcmall.back.model.embedDTO" alias="embedDTO"/>
+        <typeAlias type="com.dcmall.back.model.EmbedDTO" alias="embedDTO"/>
+        <typeAlias type="com.dcmall.back.model.NotificationDTO" alias="NotificationDTO"/>
+        <typeAlias type="com.dcmall.back.model.SelectNotificationDTO" alias="SelectNotificationDTO"/>
     </typeAliases>
 
     <typeHandlers>
@@ -14,5 +21,6 @@
 
     <mappers>
         <mapper resource="mapper/postgres/embed.xml"/>
+        <mapper resource="mapper/postgres/notification.xml"/>
     </mappers>
 </configuration>
