@@ -15,10 +15,6 @@
         <typeAlias type="com.dcmall.back.model.SelectNotificationDTO" alias="SelectNotificationDTO"/>
     </typeAliases>
 
-    <typeHandlers>
-        <typeHandler handler="com.dcmall.back.FloatArrayTypeHandler" javaType="java.util.ArrayList" jdbcType="ARRAY"/>
-    </typeHandlers>
-
     <mappers>
         <mapper resource="mapper/postgres/embed.xml"/>
         <mapper resource="mapper/postgres/notification.xml"/>
