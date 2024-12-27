@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dcmall.back.model.NotificationDAO">
+    <select id="selectNotification" parameterType="map" resultType="SelectNotificationDTO">
+        <![CDATA[
+        SELECT
+            n.num AS usernum,
+            n.title AS title,
+            e.title AS Etitle,
+            e.url AS url,
+            e.sitenum AS sitenum
+        FROM embedtable e
+                 JOIN notification n ON (
+            (e.num > 3 AND (1 - (e.embedding <=> n.embedding)) > n.threshold)
+                OR (
+                e.title ILIKE '%' || n.title || '%'
+        AND n.threshold / 100.0 <= (1 - (e.embedding <=> n.embedding)) +
+            CASE
+                WHEN e.title ILIKE n.title || '%' THEN 0.5  -- 접두어 매칭 (50% 가중치)
+                WHEN e.title ILIKE '%' || n.title || '%' THEN 0.3  -- 키워드 매칭 (30% 가중치)
+                ELSE 0
+            END
+                )
+            )
+        ORDER BY n.num
+        ]]>
+    </select>
+</mapper>
+
+
