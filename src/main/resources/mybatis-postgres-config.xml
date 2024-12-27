@@ -4,15 +4,19 @@
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
-    <typeAliases>
-        <typeAlias type="com.dcmall.back.model.embedDTO" alias="embedDTO"/>
-    </typeAliases>
+    <settings>
+        <setting name="cacheEnabled" value="false"/>
+        <setting name="defaultExecutorType" value="REUSE"/>
+    </settings>
 
-    <typeHandlers>
-        <typeHandler handler="com.dcmall.back.FloatArrayTypeHandler" javaType="java.util.ArrayList" jdbcType="ARRAY"/>
-    </typeHandlers>
+    <typeAliases>
+        <typeAlias type="com.dcmall.back.model.EmbedDTO" alias="embedDTO"/>
+        <typeAlias type="com.dcmall.back.model.NotificationDTO" alias="NotificationDTO"/>
+        <typeAlias type="com.dcmall.back.model.SelectNotificationDTO" alias="SelectNotificationDTO"/>
+    </typeAliases>
 
     <mappers>
         <mapper resource="mapper/postgres/embed.xml"/>
+        <mapper resource="mapper/postgres/notification.xml"/>
     </mappers>
 </configuration>
