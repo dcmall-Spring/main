@@ -26,10 +26,13 @@ public class NotificationService {
     public void titleCompare(int num){
 
         List<SelectNotificationDTO> sn = notificationDAO.notifications(num);
+        int numCheck = 0;
 
         for(SelectNotificationDTO notification : sn){
-
-            sendmessage(notification.getUserNum(), notification.getTitle(), notification.getUrl(), notification.getSiteNum());
+            if(notification.getUserNum() != numCheck){
+                numCheck = notification.getUserNum();
+                sendmessage(notification.getUserNum(), notification.getTitle(), notification.getUrl(), notification.getSiteNum());
+            }
         }
 
     }
