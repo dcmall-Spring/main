@@ -50,7 +50,7 @@ public class WebController {
                 } catch (Exception e) {
                     System.out.println("FMKorea crawling error: " + e.getMessage());
                 }*/
-            /*}).thenRun(() -> {
+            }).thenRun(() -> {
                 try {
                     webCrawlerService.scrapeRuliWeb("https://m.ruliweb.com/market/board/1020");
                     System.out.println("RuliWeb crawling completed");
@@ -71,7 +71,7 @@ public class WebController {
                     System.out.println("Send Message completed");
                 }catch (Exception e) {
                     System.out.println("Send Message error: " + e.getMessage());
-                }*/
+                }
             }).join();
 
             return "All scheduled crawling completed successfully";
@@ -79,6 +79,5 @@ public class WebController {
             return "Scheduled crawling error: " + e.getMessage();
         }
     }
-
 
 }

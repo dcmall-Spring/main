@@ -206,7 +206,7 @@ public class WebCrawlerService {
                     ruilwebResult.add(new ruilwebCost(total, 0, Integer.MAX_VALUE));
 
                     while(!checkCost){
-                        ruilwebResult = getCost(titles.get(i).text(), (ruilwebResult.get(0).getIndex() == Integer.MAX_VALUE) ? titles.get(i).text().length() : ruilwebResult.get(0).getIndex() );
+                        ruilwebResult = getCost(titles.get(i).text(), (ruilwebResult.get(0).getIndex() == Integer.MAX_VALUE) ? titles.get(i).text().length() : ruilwebResult.get(0).getIndex());
                         if (ruilwebResult.get(0).getCost().intValue() != -1) {
                             ruilwebCost ruil = ruilwebResult.get(0);
                             square = ruil.getSquare();
