@@ -32,9 +32,9 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.11
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             docker pull myrepo/myapp:latest
             docker stop myapp || true
