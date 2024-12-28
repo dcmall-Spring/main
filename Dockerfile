@@ -10,4 +10,4 @@ WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar myapp.jar
 EXPOSE 8080
 LABEL authors="LJH"
-ENTRYPOINT ["java", "-jar", "myapp.jar"]
+ENTRYPOINT ["java", "-jar", "myapp.jar", "--server.address=0.0.0.0", "--server.port=8080"]
