@@ -42,7 +42,7 @@ jobs:
             docker rm dcmall || true
             # 80:8080 으로 매핑 (Spring Boot의 8080)
             docker run -d --name dcmall -p 80:8080 \
-            -v /dcmallkey/application.properties:/app/config/application.properties \ 
+            -v /dcmallkey/application.properties:/app/config/application.properties \
             mefin9291/dcmall:latest
 
 
