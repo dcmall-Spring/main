@@ -26,7 +26,7 @@ jobs:
       # (4) Docker Hub에 Push
       - name: Push Docker Image
         run: |
-          docker push myrepo/myapp:latest
+          docker push mefin9291/dcmall:latest
 
       # (5) SSH로 EC2 접속 → 배포
       - name: Deploy to EC2
