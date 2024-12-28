@@ -36,11 +36,12 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull myrepo/myapp:latest
-            docker stop myapp || true
-            docker rm myapp || true
+            docker login -u "xxeldoradornrmf@gmail.com" -p "18tjq!~_(docker)"
+            docker pull mefin9291/dcmall:latest
+            docker stop dcmall || true
+            docker rm dcmall || true
             # 80:8080 으로 매핑 (Spring Boot의 8080)
-            docker run -d --name myapp -p 80:8080 myrepo/myapp:latest
+            docker run -d --name dcmall -p 80:8080 mefin9291/dcmall:latest
 
 
 
