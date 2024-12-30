@@ -42,7 +42,6 @@ jobs:
             docker rm dcmall || true
             # 80:8080 으로 매핑 (Spring Boot의 8080)
             docker run -d --name dcmall -p 80:8080 \
-            --memory="900m" --memory-swap="2g" \
             -v /dcmallkey/application.properties:/app/config/application.properties \
             -e JAVA_OPTS="-Xms256m -Xmx512m" \
             mefin9291/dcmall:latest
