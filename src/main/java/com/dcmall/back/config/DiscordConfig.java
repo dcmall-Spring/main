@@ -18,7 +18,6 @@ public class DiscordConfig {
         JDA jda = JDABuilder.createDefault(DiscordToken)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .build();
-        jda.awaitReady();
         return jda;
     }
 
