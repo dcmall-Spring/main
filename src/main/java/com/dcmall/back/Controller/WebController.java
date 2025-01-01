@@ -21,7 +21,6 @@ public class WebController {
     private NotificationService notificationService;
 
     @GetMapping("/scrape")
-    @Scheduled(fixedRate = 600000)
     public String scrape() {
         Object result = embedDAO.selectEmbedNum();
         int num;
@@ -35,7 +34,6 @@ public class WebController {
         }
 
         try {
-            System.out.println(num);
             notificationService.titleCompare(num);
             System.out.println("Send Message completed");
         } catch (Exception e) {
