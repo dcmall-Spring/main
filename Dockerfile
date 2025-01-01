@@ -1,5 +1,5 @@
 # (1) 빌드 단계
-FROM gradle:7.6.0-jdk17 AS builder
+FROM gradle:8.3.1-jdk21 AS builder
 WORKDIR /app
 COPY . /app
 RUN gradle clean build -x test
