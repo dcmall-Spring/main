@@ -5,7 +5,7 @@ COPY . /app
 RUN gradle clean build -x test
 
 # (2) 런타임 단계
-FROM openjdk:21-alpine
+FROM openjdk:21-jdk
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar myapp.jar
 EXPOSE 8080
