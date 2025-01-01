@@ -21,8 +21,6 @@ public class NotificationService {
     @Autowired
     private DiscordService discordService;
 
-
-
     public void titleCompare(int num){
 
         List<SelectNotificationDTO> sn = notificationDAO.notifications(num);

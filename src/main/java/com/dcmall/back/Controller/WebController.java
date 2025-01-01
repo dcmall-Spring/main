@@ -3,6 +3,7 @@ package com.dcmall.back.Controller;
 import com.dcmall.back.Service.NotificationService;
 import com.dcmall.back.model.EmbedDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,6 @@ public class WebController {
             num = 0;
         }
         try {
-            System.out.println(num);
             notificationService.titleCompare(num);
             System.out.println("Send Message completed");
         } catch (Exception e) {
